@@ -1,0 +1,56 @@
+DOWN
+NODE SEQ
+  DOWN
+  NODE =
+    DOWN
+    NODE ID apple
+    NODE /
+      DOWN
+      NODE *
+	DOWN
+	NODE ID banana
+	NODE INTLIT 2
+	UP
+      NODE ID carrot
+      UP
+    UP
+  NODE IFELSE
+    DOWN
+      NODE ==
+	DOWN
+	NODE ID date
+	NODE ID eggplant
+	UP
+    NODE SEQ
+      DOWN
+      NODE =
+	DOWN
+	NODE ID fennel
+	NODE +
+	  DOWN
+	  NODE ID grits
+	  NODE *
+	    DOWN
+	    NODE DOUBLELIT 3.14
+	    NODE ID hominy
+	    UP
+	  UP
+	UP
+      NODE =
+	DOWN
+	NODE ID juniper
+	NODE ID kale
+	UP
+      UP
+    NODE =
+      DOWN
+      NODE ID lettuce
+      NODE -
+        DOWN
+        NODE ID mustard
+        NODE ID napa
+        UP
+      UP
+    UP
+  UP
+UP
