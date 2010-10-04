@@ -1,0 +1,28 @@
+Things left to do for Part 1:
+
+* For loop
+* While loop
+* Do-while loop
+* <=
+* >=
+* >
+* <
+* &&
+* ||
+* !=
+* !
+* ++var, var++
+* --var, var--
+* ( )
+* read, write
+* return
+* function calls
+* function parameters
+* *
+* &
+* arrays
+
+Things to ask Tom Cormen:
+* Are 'read' and 'write' function calls?
+* ;'s ?
+* variables?
