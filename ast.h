@@ -13,27 +13,36 @@
 #define AST_H_
 
 /* You should fill in the various node types.  The following are given
-   to you to start with.  You may add or remove node types as you
-   wish. */
+ to you to start with.  You may add or remove node types as you
+ wish. */
 typedef enum { ROOT,
-	       SEQ,
-	       OP_ASSIGN, OP_PLUS, OP_MINUS, OP_TIMES, OP_DIVIDE,
-	       OP_EQUALS,
-	       IF, IF_ELSE,
-	       ID, 
-	       INT_LITERAL, DOUBLE_LITERAL } ast_node_type;
+	SEQ,
+	OP_ASSIGN, OP_PLUS, OP_MINUS, OP_TIMES, OP_DIVIDE,
+	OP_EQUALS,
+	IF, IF_ELSE,
+	ID, 
+	INT_LITERAL, DOUBLE_LITERAL,
+	FOR_LOOP, WHILE_LOOP, DO_WHILE_LOOP,
+	OP_NOT_EQUALS, OP_GREATER_THAN, OP_LESS THAN, OP_GREATER_EQUALS, OP_LESS_EQUALS,
+	INT_POINTER, DOUBLE_POINTER, INT_VAR, DOUBLE_VAR,
+	STRING_LITERAL,
+	FUNCTION,
+	OP_NOT, OP_PRE_INCR, OP_POST_INCR, OP_PRE_DECR, OP_POST_DERCR, OP_NEGATIVE,
+	OP_AND, OP_OR,
+	RETURN, READ, WRITE
+	} ast_node_type;
 
 /* Structure for nodes of the abstract syntax tree.  You should
-   add or remove fields as appropriate. */
+ add or remove fields as appropriate. */
 typedef struct ast_node_struct *ast_node;
 struct ast_node_struct {
-  ast_node_type node_type;
-  ast_node left_child, right_sibling;
-  union {
-    char * string;		/* for ID */
-    int int_value;		/* for INT_LITERAL */
-    double double_value;	/* for DOUBLE_LITERAL */
-  } value;
+	ast_node_type node_type;
+	ast_node left_child, right_sibling;
+	union {
+		char * string;		/* for ID */
+		int int_value;		/* for INT_LITERAL */
+		double double_value;	/* for DOUBLE_LITERAL */
+	} value;
 };
 
 #endif
