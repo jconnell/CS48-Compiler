@@ -114,10 +114,9 @@ static struct token_lookup token_table[] = {
 	{ "<", OP_LESS_THAN },
 	{ ">=", OP_GREATER_EQUALS },
 	{ "<=", OP_LESS_EQUALS },
-	{ "INTPTR", INT_POINTER },
-	{ "DOUBLEPTR", DOUBLE_POINTER },
+	{ "&", OP_ADDRESS},
+	{ "DEREFERENCE", OP_DEREFERENCE},
 	{ "STRLIT", STRING_LITERAL },
-	{ "FUNCTION", FUNCTION },
 	{ "!", OP_NOT },
 	{ "PRE++", OP_PRE_INCR },
 	{ "POST++", OP_POST_INCR },
@@ -266,6 +265,10 @@ void print_ast(ast_node root, int depth) {
 			
 		case DOUBLE_LITERAL:		/* print the double literal */
 			printf("%f", root->value.double_value);
+			break;
+			
+		case STRING_LITERAL:		/* print the string literal */
+			printf("%s", root->value.string);
 			break;
 			
 		default:
