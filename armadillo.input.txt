@@ -1,0 +1,97 @@
+DOWN
+NODE SEQ
+	DOWN
+	NODE =
+		DOWN
+		NODE ID t
+		NODE INTLIT 10
+		UP
+	NODE ID act
+		DOWN
+		NODE RETURN
+			DOWN
+			NODE INTLIT 10
+			UP
+		UP
+	NODE IF
+		DOWN
+		NODE <=
+			DOWN
+			NODE DOUBLELIT 10.5
+			NODE DOUBLELIT 10.4
+			UP
+		NODE SEQ
+			DOWN	
+			NODE ID act
+				DOWN
+				NODE ID t
+				NODE SEQ
+					DOWN
+					NODE PRE--
+						DOWN
+						NODE ID t
+						UP
+					NODE RETURN
+						DOWN
+						NODE ID t
+						UP
+					UP
+				UP
+				
+			UP
+		UP
+	NODE WRITE
+		DOWN
+		NODE STRLIT Hello
+		UP
+	NODE WRITE
+		DOWN
+		NODE ID t
+		UP
+	NODE PRE++
+		DOWN
+		NODE ID t
+		UP
+	NODE POST++
+		DOWN
+		NODE ID t
+		UP
+	NODE =
+		DOWN
+		NODE ID ta
+		NODE &
+			DOWN
+			NODE ID t
+			UP
+		UP
+	NODE ID i
+	NODE DOWHILELOOP
+		DOWN
+		NODE SEQ
+			DOWN
+			NODE POST--
+				DOWN
+				NODE ID i
+				UP	
+			NODE POST--
+				DOWN
+				NODE ID i
+				UP	
+			UP
+		NODE ||
+			DOWN
+			NODE !=
+				DOWN
+				NODE INTLIT 10
+				NODE ID ta
+				UP
+			NODE >
+				DOWN
+				NODE INTLIT 15
+				NODE INTLIT 10
+				UP
+			UP
+		UP
+	UP
+UP
+		

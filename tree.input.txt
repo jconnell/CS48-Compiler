@@ -1,0 +1,61 @@
+DOWN
+NODE =
+	DOWN
+	NODE ID oak
+	NODE ID maple
+	UP
+NODE FORLOOP
+	DOWN
+	NODE =
+		DOWN
+		NODE ID oak
+		NODE INTLIT 1
+		UP
+	NODE <
+		DOWN
+		NODE ID oak
+		NODE INTLIT 0
+		UP
+	NODE PRE++
+		DOWN
+		NODE ID oak
+		UP
+	NODE IF
+		DOWN
+		NODE ||
+			DOWN
+			NODE &&
+				DOWN
+				NODE >=
+					DOWN
+					NODE ID maple
+					NODE ID birch
+					UP
+				NODE !=
+					DOWN
+					NODE ID pine
+					NODE ID holly
+					UP
+				UP
+			NODE <=
+				DOWN
+				NODE ID chestnut
+				NODE ID apple
+				UP
+			UP
+		NODE SEQ
+			DOWN
+			NODE =
+				DOWN
+				NODE ID sycamore
+				NODE ID binary
+				UP
+			NODE =
+				DOWN
+				NODE ID binary
+				NODE ID NULL
+				UP
+			UP
+		UP
+	UP
+UP

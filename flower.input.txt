@@ -1,0 +1,31 @@
+DOWN
+NODE SEQ
+	DOWN
+	NODE WHILELOOP
+		DOWN
+		NODE !
+			DOWN
+			NODE ID rose
+			UP
+		NODE IF
+			DOWN
+			NODE <
+				DOWN
+				NODE NEG
+					DOWN
+					NODE ID pansy
+					UP
+				NODE INTLIT 0
+				UP
+			NODE READ
+				DOWN
+				NODE ID tulip
+				UP
+			UP
+		UP
+	NODE DEREFERENCE
+		DOWN
+		NODE ID j
+		UP
+	UP
+UP
