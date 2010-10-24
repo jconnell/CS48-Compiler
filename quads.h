@@ -12,7 +12,7 @@
 
 typedef enum {rd, gt, if_f, asn, lab, mul, sub, eq, wri, halt} OpKind;
 
-typedef enum {Empty, IntConst, DoubleConst, String} AddrKind;
+typedef enum {Empty, IntConst, String} AddrKind;
 
 typedef struct
 {
