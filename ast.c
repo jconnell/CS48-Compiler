@@ -1,4 +1,8 @@
 /* ast.c
+ * 
+ * Modified, used, and tested by:
+ * Jonathan Connell
+ * David Kopec
  *
  * Skeleton code to build an abstract syntax tree from an input file
  * describing the structure of the tree.  Each line of the input file
