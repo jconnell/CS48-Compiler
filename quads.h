@@ -1,7 +1,6 @@
-/* Symtab.h
- * Declarations for the symbol table.
- * Written by THC for CS 48.
- * You should extend the structs and functions as appropriate.
+/* quads.h
+ * Declarations for the quad functions/code generation
+ * Written by DK and JC for CS 48.
  */
 
 #include "ast.h"
