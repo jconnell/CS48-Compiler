@@ -1,7 +1,6 @@
-/* Symtab.c
- * Functions for the symbol table.
- * Written by THC for CS 48.
- * You should extend the functions as appropriate.
+/* quads.c
+ * Basic quad fucntions and code generation
+ * Written by DK and JC for CS 48.
  */
 
 #include <stdlib.h>
