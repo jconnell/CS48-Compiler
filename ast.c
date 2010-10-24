@@ -114,8 +114,6 @@ static struct token_lookup token_table[] = {
 	{ "<", OP_LESS_THAN },
 	{ ">=", OP_GREATER_EQUALS },
 	{ "<=", OP_LESS_EQUALS },
-	{ "&", OP_ADDRESS},
-	{ "DEREFERENCE", OP_DEREFERENCE},
 	{ "STRLIT", STRING_LITERAL },
 	{ "!", OP_NOT },
 	{ "PRE++", OP_PRE_INCR },
@@ -128,6 +126,14 @@ static struct token_lookup token_table[] = {
 	{ "RETURN", RETURN },
 	{ "READ", READ },
 	{ "WRITE", WRITE },
+	{ "INT", INT_DEC},
+	{ "DOUBLE", DOU_DEC},
+	{ "INT[]", INT_ARRAY_DEC},
+	{ "DOUBLE[]", DOU_ARRAY_DEC},
+	{ "FUNCTIONDEFINITION", FUNC_DEF},
+	{ "FUNCTIONPARAMETER", FUNC_PARAM},
+	{ "FUNCTIONCALL", FUNC_CALL},
+	{ "CONST", CONSTANT},
 	{ NULL, 0 }
 };
 
