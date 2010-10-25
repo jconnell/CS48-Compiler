@@ -1,11 +1,16 @@
 /* 
  * ast.h
  *
+ * Modified, used, and tested by:
+ * Jonathan Connell
+ * David Kopec
+ *
  * File defining an enum and a struct for node types in an abstract
  * syntax tree.
  *
  * Written by THC for CS 48.  You should modify this file as
  * appropriate.
+ *
  *
  */
 
