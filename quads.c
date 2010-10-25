@@ -16,12 +16,16 @@ int tempCount = 0;			//for unique temp names
 Quad *quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
+//Actually creates the quads by recursing;
+//We will return the quad that was the last result or -1 if we have no result
 int CG(ast_node n)
 {
 	switch (n->node_type) {
 			
-			//Dave adds new cases BELOW here, Jon ABOVE
-			//if it's a SEQ, we want to just recursively produce code for all the children
+		
+		//Dave adds new cases BELOW here, Jon ABOVE
+			
+		//if it's a SEQ, we want to just recursively produce code for all the children
 		case SEQ:
 			//adapted from THC if code
 			ast_node x = n->left_child;
@@ -30,9 +34,86 @@ int CG(ast_node n)
 				x = x->right_sibling;
 			}
 			break;
+		
+		//ROOT is nothing in itself, so we just start recursing down the tree
+		case ROOT:
+			CG(n->left_child);
+			break;
+		
+		//Here we do the addition and then we return the position so higher up nodes can find the result
+		case OP_PLUS:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(add, ar1, ar2, ar3);
+			break;
+			
+		case OP_MINUS:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(sub, ar1, ar2, ar3);
+			break;
+			
+		case OP_TIMES:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(mul, ar1, ar2, ar3);
+			break;
+			
+		case OP_DIVIDE:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(div, ar1, ar2, ar3);
+			break;
+
+
+
+
 		default:
 			break;
 	}
+	
+	//default, we return -1 which means no result from the previous call...
+	return -1;
 }
 
 //makes a quad out of the actual parameters, adds it to the array of quads
