@@ -105,6 +105,21 @@ int CG(ast_node n)
 			return GenQuad(div, ar1, ar2, ar3);
 			break;
 
+		case OP_NEGATIVE:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//this should only have one child
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//we need to subtract from 0
+			ar3.kind = IntConst;
+			ar3.contents.val = 0;
+			
+			return GenQuad(sub, ar1, ar3, ar2);
+			break;
 
 
 
@@ -189,4 +204,14 @@ int main()
 	//create symbol table
 	SymbolTable *symtab = CreateSymbolTable();
 	//now we call CG of some node....
+	
+	//print all of our quads for debug purposes
+	/*
+	int i = 0;
+	while(quads[i] != null)
+	{
+		printf("...");
+		i++;
+	}
+	*/
 }
