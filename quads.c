@@ -18,7 +18,21 @@ SymbolTable *symtab;		//symbol table
 
 int CG(ast_node n)
 {
-	
+	switch (n->node_type) {
+			
+			//Dave adds new cases BELOW here, Jon ABOVE
+			//if it's a SEQ, we want to just recursively produce code for all the children
+		case SEQ:
+			//adapted from THC if code
+			ast_node x = n->left_child;
+			while (x != null) {
+				CG(x);
+				x = x->right_sibling;
+			}
+			break;
+		default:
+			break;
+	}
 }
 
 //makes a quad out of the actual parameters, adds it to the array of quads
