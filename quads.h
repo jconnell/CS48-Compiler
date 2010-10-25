@@ -34,6 +34,7 @@ int CG(ast_node n);
 int GenQuad(OpKind o, Address a, Address b, Address c);
 void PatchQuad(Quad q, int l, Address n);
 int NextQuad();
+char *NewTemp();
 
 
 #endif

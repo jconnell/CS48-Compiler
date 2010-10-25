@@ -7,10 +7,14 @@
 #include <string.h>
 #include <stdio.h>
 #include "quads.h"
+#include "ast.h"
+#include "Symtab.h"
 
 //GLOBAL VARIABLES
 int currentQuad = 0;		//index into quads
+int tempCount = 0;			//for unique temp names
 Quad *quads;				//array of Quads
+SymbolTable *symtab;		//symbol table
 
 int CG(ast_node n)
 {
@@ -67,6 +71,19 @@ int NextQuad()
 	return currentQuad+1;
 }
 
+//adds a new temp to the symbol table and return its name
+char *NewTemp()
+{
+	char tempName[5];
+	sprintf(tempName, "$t%d", tempCount);  //$t#
+	
+	InsertIntoSymbolTable(symtab, tempName);
+	
+	tempCount++;			//so next one has unique name
+	
+	return tempName;
+}
+
 //main function
 int main() 
 {
@@ -74,5 +91,7 @@ int main()
 	//in C48 will get beyond this using our compiler - consider it a "compiler limit"
 	quads = malloc(10000 * sizeof(Quad));
 	
+	//create symbol table
+	SymbolTable *symtab = CreateSymbolTable();
 	//now we call CG of some node....
 }
