@@ -1,16 +1,11 @@
 /* 
  * ast.h
  *
- * Modified, used, and tested by:
- * Jonathan Connell
- * David Kopec
- *
  * File defining an enum and a struct for node types in an abstract
  * syntax tree.
  *
  * Written by THC for CS 48.  You should modify this file as
  * appropriate.
- *
  *
  */
 
@@ -34,7 +29,8 @@ typedef enum { ROOT,
 	OP_AND, OP_OR,
 	RETURN, READ, WRITE,
 	INT_DEC, DOU_DEC, INT_ARRAY_DEC, DOU_ARRAY_DEC,
-	FUNC_DEF, FUNC_PARAM, FUNC_CALL, CONSTANT
+	FUNC_DEF, FUNC_PARAM, FUNC_CALL, CONSTANT,
+	SWITCH_ST, BREAK_ST, CONTINUE_ST
 	} ast_node_type;
 
 /* Structure for nodes of the abstract syntax tree.  You should

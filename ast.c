@@ -1,8 +1,4 @@
 /* ast.c
- * 
- * Modified, used, and tested by:
- * Jonathan Connell
- * David Kopec
  *
  * Skeleton code to build an abstract syntax tree from an input file
  * describing the structure of the tree.  Each line of the input file
@@ -138,6 +134,9 @@ static struct token_lookup token_table[] = {
 	{ "FUNCTIONPARAMETER", FUNC_PARAM},
 	{ "FUNCTIONCALL", FUNC_CALL},
 	{ "CONST", CONSTANT},
+	{ "SWITCH", SWITCH_ST},
+	{ "BREAK", BREAK_ST},
+	{ "CONTINUE", CONTINUE_ST},
 	{ NULL, 0 }
 };
 
