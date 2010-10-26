@@ -70,7 +70,7 @@ int CG(ast_node n)
 			int rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp].addr1;
 			
-			return GenQuad(jg, ar1, ar2, ar3)
+			return GenQuad(gt, ar1, ar2, ar3)
 			break;
 		
 		// "<" (LESS THAN) operation
@@ -87,7 +87,7 @@ int CG(ast_node n)
 			int rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp].addr1;
 			
-			return GenQuad(jl, ar1, ar2, ar3)
+			return GenQuad(lt, ar1, ar2, ar3)
 			break;
 			
 		// ">=" (GREATER THAN OR EQUAL TO) operation
@@ -104,7 +104,7 @@ int CG(ast_node n)
 			int rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp].addr1;
 			
-			return GenQuad(jge, ar1, ar2, ar3)
+			return GenQuad(gteq, ar1, ar2, ar3)
 			break;
 			
 		// "<=" (LESS THAN OR EQUAL TO) operation
@@ -121,7 +121,7 @@ int CG(ast_node n)
 			int rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp].addr1;
 			
-			return GenQuad(jle, ar1, ar2, ar3)
+			return GenQuad(lteq, ar1, ar2, ar3)
 			break;
 			
 		// "||" (OR) operation
