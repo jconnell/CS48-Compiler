@@ -19,9 +19,9 @@ static SymNode *CreateSymNode(char *name) {
 	/*set attributes to default values*/
 	node->attrs = malloc(sizeof(NodeAttrs));
 	node->attrs->size = 0;
-	node->attrs->type = 'u';
-	node->attrs->address.intAddress = NULL;
-	node->attrs->flags = NULL;
+	node->attrs->type = None;
+	node->attrs->v.iaaddr = NULL;
+	node->attrs->flags = 0;
 	return node;
 }
 
@@ -29,7 +29,6 @@ static SymNode *CreateSymNode(char *name) {
 static void DestroySymNode(SymNode *node) {
 	free(node->name);
 	/*we had to malloc flags since it's a string, so we must free it*/
-	free(node->attrs->flags);
 	free(node->attrs);
 	free(node);
 }
@@ -39,6 +38,47 @@ void SetNodeAttributes(SymNode *node, NodeAttrs *na)
 {
 	node->attrs = na;
 }
+
+void SetSizeAttr(SymNode *node, int s)
+{
+	node->attrs->size = s;
+}
+
+int GetSizeAttr(SymNode *node)
+{
+	return node->attrs->s;
+}
+
+void SetTypeAttr(SymNode *node, typeenum te)
+{
+	node->attrs->type = te;
+}
+
+typeenum GetTypeAttr(SymNode *node)
+{
+	return node->attrs->type;
+}
+
+void SetFlagsAttr(SymNode *node, int f)
+{
+	node->attrs->flags = f;
+}
+
+int GetFlagsAttr(SymNode *node)
+{
+	return node->attrs->flags;
+}
+
+void SetValueAttr(SymNode *node, value v)
+{
+	node->attrs->v = v;
+}
+
+value GetValueAttr(SymNode *node)
+{
+	return node->attrs->v;
+}
+
 
 /* set the attributes of a node*/
 NodeAttrs* LookupAttributes(SymNode *node)
