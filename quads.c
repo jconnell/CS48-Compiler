@@ -21,7 +21,160 @@ SymbolTable *symtab;		//symbol table
 int CG(ast_node n)
 {
 	switch (n->node_type) {
+		
+		// "==" (IS EQUAL TO) operation
+		case OP_EQUALS:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
 			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(eq, ar1, ar2, ar3)
+			break;
+			
+		// "!=" (IS NOT EQUAL TO) operation
+		case OP_NOT_EQUALS:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(neq, ar1, ar2, ar3)
+			break;
+			
+		// ">" (GREATER THAN) operation
+		case OP_GREATER_THAN:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(jg, ar1, ar2, ar3)
+			break;
+		
+		// "<" (LESS THAN) operation
+		case OP_LESS_THAN:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(jl, ar1, ar2, ar3)
+			break;
+			
+		// ">=" (GREATER THAN OR EQUAL TO) operation
+		case OP_GREATER_EQUALS:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(jge, ar1, ar2, ar3)
+			break;
+			
+		// "<=" (LESS THAN OR EQUAL TO) operation
+		case OP_LESS_EQUALS:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//left result needs to be put in
+			int lrp = CG(n->left_child);
+			ar2 = quads[lrp].addr1;
+			
+			//right child's result needs to be the other operand
+			int rrp = CG(n->left_child->right_sibling);
+			ar3 = quads[rrp].addr1;
+			
+			return GenQuad(jle, ar1, ar2, ar3)
+			break;
+			
+		// "||" (OR) operation
+		case OP_OR:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			int lrp = CG(n->left_child);
+			GenQuad(assn, ar1, lrp, NULL);
+			GenQuad(ifTrue, ar1, ?, NULL);
+			
+			ar2.kind = String;
+			ar2.contents.name = NewTemp();
+			
+			int rrp = CG(n->left_child->right_sibling);
+			GenQuad(assn, ar2, rrp, NULL);
+			GenQuad(ifTrue, ar2, ?, NULL);
+			
+			ar3.kind = String;
+			ar3.contents.name = NewTemp();
+			
+			GenQuad(assn, ar3, 0, NULL);
+			GenQuad(goto, ? NULL, NULL);
+			GenQuad(assn, ar3, 1, NULL);
+			
+			break;
+			
+		// "&&" (AND) operation
+		case OP_AND:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			int lrp = CG(n->left_child);
+			GenQuad(assn, ar1, lrp, NULL);
+			GenQuad(ifFalse, ar1, ?, NULL);
+			
+			ar2.kind = String;
+			ar2.contents.name = NewTemp();
+			
+			int rrp = CG(n->left_child->right_sibling);
+			GenQuad(assn, ar2, rrp, NULL);
+			GenQuad(ifFalse, ar2, ?, NULL);
+			
+			ar3.kind = String;
+			ar3.contents.name = NewTemp();
+			
+			GenQuad(assn, ar3, 1, NULL);
+			GenQuad(goto, ? NULL, NULL);
+			GenQuad(assn, ar3, 0, NULL);
+			
+			break;
 		
 		//Dave adds new cases BELOW here, Jon ABOVE
 			
