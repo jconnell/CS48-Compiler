@@ -105,6 +105,7 @@ int CG(ast_node n)
 			return GenQuad(div, ar1, ar2, ar3);
 			break;
 
+		//negate a number
 		case OP_NEGATIVE:
 			Address ar1, ar2, ar3;
 			ar1.kind = String;
@@ -121,7 +122,183 @@ int CG(ast_node n)
 			return GenQuad(sub, ar1, ar3, ar2);
 			break;
 
+		case INT_LITERAL:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//we are assigning this literal value to ar1
+			ar2.kind = IntConst;
+			ar2.contents.val = n->value.int_value;
+			
+			//we don't need ar3
+			ar3.kind = Empty;
+			
+			return GenQuad(asn, ar1, ar2, ar3);
+			break;
+			
+		case DOUBLE_LITERAL:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//we are assigning this literal value to ar1
+			ar2.kind = DouConst;
+			ar2.contents.dval = n->value.double_value;
+			
+			//we don't need ar3
+			ar3.kind = Empty;
+			
+			return GenQuad(asn, ar1, ar2, ar3);
+			break;
+			
+		case STRING_LITERAL:
+			Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp();
+			
+			//we are assigning this literal value to ar1
+			ar2.kind = String;
+			ar2.contents.name = n->value.string;
+			
+			//we don't need ar3
+			ar3.kind = Empty;
+			
+			return GenQuad(asn, ar1, ar2, ar3);
+			break;
+			
+		//we must insert in the symbol table the child's name
+		case INT_DEC:
+			InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
+			break;
+		
+		//we must insert the child in the symbol table
+		case DOU_DEC:
+			InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double
+			break;
+			
+		case INT_ARRAY_DEC:
+			InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int array
+			//WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
+			//A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
+			break;
+			
+		case DOU_ARRAY_DEC:
+			InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double array
+			//WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
+			//A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
+			break;
+			
+		case DOU_ARRAY_DEC:
+			InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double array
+			//WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
+			//A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
+			break;
 
+		//adapted from THC's code in class
+		//MUST TYPE CHECK THAT t RETURNS AN INT FOR COMPARISON
+		case WHILE_LOOP:
+			int tq = NextQuad();
+			int t = CG(n->left_child);
+			
+			Address tqa;
+			tqa.kind = IntConst;
+			tqa.contents.val = tq;
+			
+			Address ta = quads[t].addr1;
+			
+			Address topatch;
+			topatch.kind = Empty;
+			
+			Address e;
+			e.kind = Empty;
+			
+			//this is where we would switch the order for the dowhile
+			int testq = GenQuad(if_f, ta, topatch, e);
+			
+			CG(n->left_child->right_sibling);
+			
+			GenQuad(gt, tqa, e, e);
+			
+			Address nq;
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(testq, 2, nq);
+			break;
+	
+		//we're still assuming the comparison is the left child
+		//not the left child->right sibling
+		case DO_WHILE_LOOP:
+			int tq = NextQuad();
+			int t = CG(n->left_child);
+			
+			//just do the other stuff first and then we potentially loop or leave
+			CG(n->left_child->right_sibling);
+			
+			Address tqa;
+			tqa.kind = IntConst;
+			tqa.contents.val = tq;
+			
+			Address ta = quads[t].addr1;
+			
+			Address topatch;
+			topatch.kind = Empty;
+			
+			Address e;
+			e.kind = Empty;
+			
+			//this is where we would switch the order for the dowhile
+			int testq = GenQuad(if_f, ta, topatch, e);
+			
+			GenQuad(gt, tqa, e, e);
+			
+			Address nq;
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(testq, 2, nq);
+			break;
+			
+		//the assembler has a built in read facility, so this is very simple
+		//NEED TO DEAL WITH DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's ATTRIBUTE
+		case READ:
+			Address ar1, ar2, ar3;
+			ar1.kind = IntConst;
+			
+			ar2.kind = Empty;
+			
+			ar3.kind = Empty;
+			
+			int gq = GenQuad(rd, ar1, ar2, ar3);
+			
+			//PUT VALUE IN SYMBOL TABLE UNDER READ's CHILD
+			
+			return gq;
+			
+			break;
+			
+		//the assembler has a built in write facility, so this is very simple
+		//NEED TO HANDLE DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's TYPE ATTRIBUTE
+		case WRITE:
+			Address ar1, ar2, ar3;
+			ar1.kind = IntConst;
+			ar1.contents.val = n->left_child->value.int_value;
+			
+			ar2.kind = Empty;
+			
+			ar3.kind = Empty;
+			
+			GenQuad(wri, ar1, ar2, ar3);
+			
+			break;
+			
+		//MISSING CONST, RETURN, SWITCH, BREAK, CONTINUE
+		//RETURN NEEDS TO GO TOGETHER WITH FUNCTIONS I THINK...  MAYBE WE NEED TO TYPE CHECK WITH ANOTHER
+			//SWITCH WITHIN THE CASE OF A FUNCTION CALL
 
 		default:
 			break;
@@ -159,7 +336,7 @@ int GenQuad(OpKind o, Address a, Address b, Address c)
 //in the quad at index q
 void PatchQuad(int q, int l, Address n)
 {
-	Quad *theQuad = quads[q];
+	Quad *theQuad = &quads[q];
 	switch (l) {
 		case 1:
 			theQuad->addr1 = n;
