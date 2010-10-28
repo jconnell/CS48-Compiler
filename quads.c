@@ -524,24 +524,92 @@ char *NewTemp()
 	return tempName;
 }
 
-//main function
-int main() 
+//main function - call with the name of the AST input file
+int main(int argc, char **argv) 
 {
 	//generate the array of quads (okay we have a limit of 10,000 - we really don't think people
 	//in C48 will get beyond this using our compiler - consider it a "compiler limit"
 	quads = malloc(10000 * sizeof(Quad));
 	
+	//CODE FROM THC's ast.c
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s input_file\n", argv[0]);
+		return -1;
+	}
+	
+	ast_node root = build_ast(argv[1]); /* build an abstract syntax tree */
+	print_ast(root, 0);		      /* and print it out */
+	
+	//OUR CODE AGAIN
 	//create symbol table
 	SymbolTable *symtab = CreateSymbolTable();
-	//now we call CG of some node....
+	//now we call CG of the root node
+	
+	CG(root);
 	
 	//print all of our quads for debug purposes
-	/*
 	int i = 0;
+	char[5] a1,a2,a3;
 	while(quads[i] != null)
 	{
-		printf("...");
+		switch (quads[i].addr1.kind) 
+		{
+			case Empty:
+				a1 = " - ";
+				break;
+			case IntConst:
+				sprintf(a1,"%D",quads[i].addr1.contents.val);
+				break;
+			case DouConst:
+				sprintf(a1,"%f",quads[i].addr1.contents.dval);
+				break;
+			case String:
+				a1 = strdup(quads[i].addr1.contents.name);
+				break;
+			default:
+				break;
+		}
+		
+		switch (quads[i].addr2.kind) 
+		{
+			case Empty:
+				a2 = " - ";
+				break;
+			case IntConst:
+				sprintf(a2,"%D",quads[i].addr2.contents.val);
+				break;
+			case DouConst:
+				sprintf(a2,"%f",quads[i].addr2.contents.dval);
+				break;
+			case String:
+				a2 = strdup(quads[i].addr2.contents.name);
+				break;
+			default:
+				break;
+		}
+		
+		switch (quads[i].addr3.kind) 
+		{
+			case Empty:
+				a3 = " - ";
+				break;
+			case IntConst:
+				sprintf(a3,"%D",quads[i].addr3.contents.val);
+				break;
+			case DouConst:
+				sprintf(a3,"%f",quads[i].addr3.contents.dval);
+				break;
+			case String:
+				a3 = strdup(quads[i].addr3.contents.name);
+				break;
+			default:
+				break;
+		}
+		
+		
+		printf("(%d,%s,%s,%s)",quads[i].op,a1,a2,a3);
 		i++;
 	}
-	*/
+	
+	return 0;
 }
