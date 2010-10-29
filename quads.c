@@ -145,7 +145,7 @@ int CG(ast_node n)
 			ar3.contents.name = NewTemp();
 			
 			GenQuad(assn, ar3, 0, NULL);
-			GenQuad(goto, ? NULL, NULL);
+			GenQuad(goto, ?, NULL, NULL);
 			GenQuad(assn, ar3, 1, NULL);
 			
 			break;
@@ -171,7 +171,7 @@ int CG(ast_node n)
 			ar3.contents.name = NewTemp();
 			
 			GenQuad(assn, ar3, 1, NULL);
-			GenQuad(goto, ? NULL, NULL);
+			GenQuad(goto, ?, NULL, NULL);
 			GenQuad(assn, ar3, 0, NULL);
 			
 			break;
