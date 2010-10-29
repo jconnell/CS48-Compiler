@@ -20,11 +20,12 @@ SymbolTable *symtab;		//symbol table
 //We will return the quad that was the last result or -1 if we have no result
 int CG(ast_node n)
 {
+	Address ar1, ar2, ar3;
 	switch (n->node_type) {
 		
 		// "==" (IS EQUAL TO) operation
 		case OP_EQUALS:
-			Address ar1, ar2, ar3;
+			//Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
@@ -36,10 +37,10 @@ int CG(ast_node n)
 			int rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp].addr1;
 			
-			return GenQuad(eq, ar1, ar2, ar3)
+			return GenQuad(eq, ar1, ar2, ar3);
 			break;
 			
-		// "!=" (IS NOT EQUAL TO) operation
+/*		// "!=" (IS NOT EQUAL TO) operation
 		case OP_NOT_EQUALS:
 			Address ar1, ar2, ar3;
 			ar1.kind = String;
@@ -255,7 +256,7 @@ int CG(ast_node n)
 			int rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp].addr1;
 			
-			return GenQuad(div, ar1, ar2, ar3);
+			return GenQuad(divi, ar1, ar2, ar3);
 			break;
 
 		//negate a number
@@ -452,7 +453,7 @@ int CG(ast_node n)
 		//MISSING CONST, RETURN, SWITCH, BREAK, CONTINUE
 		//RETURN NEEDS TO GO TOGETHER WITH FUNCTIONS I THINK...  MAYBE WE NEED TO TYPE CHECK WITH ANOTHER
 			//SWITCH WITHIN THE CASE OF A FUNCTION CALL
-
+*/
 		default:
 			break;
 	}
@@ -549,8 +550,11 @@ int main(int argc, char **argv)
 	
 	//print all of our quads for debug purposes
 	int i = 0;
-	char[5] a1,a2,a3;
-	while(quads[i] != null)
+	char a1[5];
+	char a2[5];
+	char a3[5];
+	
+	while(quads[i] != NULL)
 	{
 		switch (quads[i].addr1.kind) 
 		{
