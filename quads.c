@@ -550,11 +550,15 @@ int main(int argc, char **argv)
 	
 	//print all of our quads for debug purposes
 	int i = 0;
-	char a1[5];
-	char a2[5];
-	char a3[5];
+	//char a1[5];
+	//char a2[5];
+	//char a3[5];
 	
-	while(quads[i] != NULL)
+	char* a1;
+	char* a2;
+	char* a3;
+	
+	while(quads[i].addr1.contents.name != NULL)
 	{
 		switch (quads[i].addr1.kind) 
 		{
