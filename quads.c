@@ -530,7 +530,8 @@ int main(int argc, char **argv)
 {
 	//generate the array of quads (okay we have a limit of 10,000 - we really don't think people
 	//in C48 will get beyond this using our compiler - consider it a "compiler limit"
-	quads = malloc(10000 * sizeof(Quad));
+	Quad quads[10000];
+	//quads = malloc(10000 * sizeof(Quad));
 	
 	//CODE FROM THC's ast.c
 	if (argc != 2) {
@@ -566,7 +567,7 @@ int main(int argc, char **argv)
 				a1 = " - ";
 				break;
 			case IntConst:
-				sprintf(a1,"%D",quads[i].addr1.contents.val);
+				sprintf(a1,"%d",quads[i].addr1.contents.val);
 				break;
 			case DouConst:
 				sprintf(a1,"%f",quads[i].addr1.contents.dval);
@@ -584,7 +585,7 @@ int main(int argc, char **argv)
 				a2 = " - ";
 				break;
 			case IntConst:
-				sprintf(a2,"%D",quads[i].addr2.contents.val);
+				sprintf(a2,"%d",quads[i].addr2.contents.val);
 				break;
 			case DouConst:
 				sprintf(a2,"%f",quads[i].addr2.contents.dval);
@@ -602,7 +603,7 @@ int main(int argc, char **argv)
 				a3 = " - ";
 				break;
 			case IntConst:
-				sprintf(a3,"%D",quads[i].addr3.contents.val);
+				sprintf(a3,"%d",quads[i].addr3.contents.val);
 				break;
 			case DouConst:
 				sprintf(a3,"%f",quads[i].addr3.contents.dval);
