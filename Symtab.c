@@ -46,7 +46,7 @@ void SetSizeAttr(SymNode *node, int s)
 
 int GetSizeAttr(SymNode *node)
 {
-	return node->attrs->s;
+	return node->attrs->size;
 }
 
 void SetTypeAttr(SymNode *node, typeenum te)
@@ -154,6 +154,8 @@ static int HashPJW(char *s, int size) {
  == NOHASHSLOT, then apply the hash function to figure it out. */
 static SymNode *LookupSymHashTable(SymHashTable *hashTable, char *name,
 								   int slot) {
+	
+	printf("LookupSymHashTable called\n");
 	SymNode *node;
 	
 	if (slot == NOHASHSLOT)
@@ -210,11 +212,14 @@ void DestroySymbolTable(SymbolTable *symtab) {
  entry.Insert a new entry into a SymbolTable.  Assumes that this
  entry is not already present. */
 SymNode *InsertIntoSymbolTable(SymbolTable *symtab, char *name) {
+	printf("Going to be inserting %s\n", name);
 	if (symtab->innerScope == NULL) {
+		printf("NULL innerscope error\n");
 		fprintf(stderr, "Error: inserting into an empty symbol table\n");
 		exit(1);
 	}
 	
+	printf("LookingupSymHashTable being called\n");
 	SymNode *node = LookupSymHashTable(symtab->innerScope, name, NOHASHSLOT);
 	
 	if (node == NULL)
@@ -226,6 +231,7 @@ SymNode *InsertIntoSymbolTable(SymbolTable *symtab, char *name) {
 /* Lookup an entry in a symbol table.  Return a pointer to it if
  found, NULL otherwise. */
 SymNode *LookupInSymbolTable(SymbolTable *symtab, char *name) {
+	
 	SymNode *node;
 	SymHashTable *hashTable;
 	

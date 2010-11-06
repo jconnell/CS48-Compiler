@@ -11,7 +11,7 @@
 #include "Symtab.h"
 
 //GLOBAL VARIABLES
-int currentQuad = 0;		//index into quads
+int currentQuad = -1;		//index into quads
 int tempCount = 0;			//for unique temp names
 Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
@@ -27,6 +27,7 @@ int CG(ast_node n)
 		
 		// "==" (IS EQUAL TO) operation
 		case OP_EQUALS:
+			printf("In OP_EQUALS Case\n");
 			//Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
@@ -41,6 +42,12 @@ int CG(ast_node n)
 			
 			return GenQuad(eq, ar1, ar2, ar3);
 			break;
+			
+		case ROOT:
+			printf("In ROOT case\n");
+			CG(n->left_child);
+			break;
+
 			
 /*		// "!=" (IS NOT EQUAL TO) operation
 		case OP_NOT_EQUALS:
@@ -478,9 +485,7 @@ int GenQuad(OpKind o, Address a, Address b, Address c)
 	
 	//currentQuad points to the current index into the array of the last
 	//added quad
-	if (currentQuad != 0) {
-		currentQuad++;
-	}
+	currentQuad++;
 	
 	//add it to the array
 	quads[currentQuad] = q;
@@ -517,14 +522,17 @@ int NextQuad()
 //adds a new temp to the symbol table and return its name
 char *NewTemp()
 {
+	printf("Called NewTemp\n");
 	char *tempName;
 	tempName = malloc(sizeof(char) * 7);
 	sprintf(tempName, "$t%d", tempCount);  //$t#
 	
+	printf("Inserting into Symbol Table\n");
 	InsertIntoSymbolTable(symtab, tempName);
 	
 	tempCount++;			//so next one has unique name
 	
+	printf("Leaving NewTemp\n");
 	return tempName;
 }
 
@@ -573,6 +581,8 @@ int main(int argc, char **argv)
 	char* a3;
 	
 	//SEGFAULT HAPPENING IN FOLLOWING CODE
+	
+	printf("Entering Debug Printing While Loop\n");
 	
 	while(quads[i]->addr1.contents.name != NULL)
 	{
