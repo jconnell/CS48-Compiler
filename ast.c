@@ -292,15 +292,3 @@ void print_ast(ast_node root, int depth) {
 	for (child = root->left_child; child != NULL; child = child->right_sibling)
 		print_ast(child, depth + 1);
 }  
-
-/* Main method for testing. */
-int main(int argc, char **argv) {
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s input_file\n", argv[0]);
-		return -1;
-	}
-	
-	ast_node root = build_ast(argv[1]); /* build an abstract syntax tree */
-	print_ast(root, 0);		      /* and print it out */
-	return 0;
-}

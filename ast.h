@@ -46,4 +46,6 @@ struct ast_node_struct {
 	} value;
 };
 
+ast_node build_ast(char *file_name);
+
 #endif

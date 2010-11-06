@@ -13,13 +13,15 @@
 //GLOBAL VARIABLES
 int currentQuad = 0;		//index into quads
 int tempCount = 0;			//for unique temp names
-Quad *quads;				//array of Quads
+Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
 //Actually creates the quads by recursing;
 //We will return the quad that was the last result or -1 if we have no result
 int CG(ast_node n)
 {
+	printf("Called CG\n");
+	
 	Address ar1, ar2, ar3;
 	switch (n->node_type) {
 		
@@ -31,11 +33,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(eq, ar1, ar2, ar3);
 			break;
@@ -48,11 +50,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(neq, ar1, ar2, ar3)
 			break;
@@ -65,11 +67,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(gt, ar1, ar2, ar3)
 			break;
@@ -82,11 +84,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(lt, ar1, ar2, ar3)
 			break;
@@ -99,11 +101,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(gteq, ar1, ar2, ar3)
 			break;
@@ -116,11 +118,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(lteq, ar1, ar2, ar3)
 			break;
@@ -202,11 +204,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(add, ar1, ar2, ar3);
 			break;
@@ -218,11 +220,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(sub, ar1, ar2, ar3);
 			break;
@@ -234,11 +236,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(mul, ar1, ar2, ar3);
 			break;
@@ -250,11 +252,11 @@ int CG(ast_node n)
 			
 			//left result needs to be put in
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
 			int rrp = CG(n->left_child->right_sibling);
-			ar3 = quads[rrp].addr1;
+			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(divi, ar1, ar2, ar3);
 			break;
@@ -267,7 +269,7 @@ int CG(ast_node n)
 			
 			//this should only have one child
 			int lrp = CG(n->left_child);
-			ar2 = quads[lrp].addr1;
+			ar2 = quads[lrp]->addr1;
 			
 			//we need to subtract from 0
 			ar3.kind = IntConst;
@@ -490,7 +492,7 @@ int GenQuad(OpKind o, Address a, Address b, Address c)
 //in the quad at index q
 void PatchQuad(int q, int l, Address n)
 {
-	Quad *theQuad = &quads[q];
+	Quad *theQuad = quads[q];
 	switch (l) {
 		case 1:
 			theQuad->addr1 = n;
@@ -515,7 +517,8 @@ int NextQuad()
 //adds a new temp to the symbol table and return its name
 char *NewTemp()
 {
-	char tempName[5];
+	char *tempName;
+	tempName = malloc(sizeof(char) * 7);
 	sprintf(tempName, "$t%d", tempCount);  //$t#
 	
 	InsertIntoSymbolTable(symtab, tempName);
@@ -530,8 +533,7 @@ int main(int argc, char **argv)
 {
 	//generate the array of quads (okay we have a limit of 10,000 - we really don't think people
 	//in C48 will get beyond this using our compiler - consider it a "compiler limit"
-	Quad quads[10000];
-	//quads = malloc(10000 * sizeof(Quad));
+	quads = malloc(10000 * sizeof(Quad *));
 	
 	//CODE FROM THC's ast.c
 	if (argc != 2) {
@@ -539,13 +541,24 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	
-	ast_node root = build_ast(argv[1]); /* build an abstract syntax tree */
+	ast_node root;
+	
+	printf("Building AST\n");
+	
+	root = build_ast(argv[1]); /* build an abstract syntax tree */
+	
+	printf("Printing AST\n");
+	
 	print_ast(root, 0);		      /* and print it out */
+	
+	printf("Creating Symbol Table\n");
 	
 	//OUR CODE AGAIN
 	//create symbol table
 	SymbolTable *symtab = CreateSymbolTable();
 	//now we call CG of the root node
+	
+	printf("Calling CG on root node\n");
 	
 	CG(root);
 	
@@ -559,66 +572,70 @@ int main(int argc, char **argv)
 	char* a2;
 	char* a3;
 	
-	while(quads[i].addr1.contents.name != NULL)
+	//SEGFAULT HAPPENING IN FOLLOWING CODE
+	
+	while(quads[i]->addr1.contents.name != NULL)
 	{
-		switch (quads[i].addr1.kind) 
+		printf("entered while\n");
+		switch (quads[i]->addr1.kind) 
 		{
 			case Empty:
 				a1 = " - ";
 				break;
 			case IntConst:
-				sprintf(a1,"%d",quads[i].addr1.contents.val);
+				sprintf(a1,"%d",quads[i]->addr1.contents.val);
 				break;
 			case DouConst:
-				sprintf(a1,"%f",quads[i].addr1.contents.dval);
+				sprintf(a1,"%f",quads[i]->addr1.contents.dval);
 				break;
 			case String:
-				a1 = strdup(quads[i].addr1.contents.name);
+				a1 = strdup(quads[i]->addr1.contents.name);
 				break;
 			default:
 				break;
 		}
 		
-		switch (quads[i].addr2.kind) 
+		switch (quads[i]->addr2.kind) 
 		{
 			case Empty:
 				a2 = " - ";
 				break;
 			case IntConst:
-				sprintf(a2,"%d",quads[i].addr2.contents.val);
+				sprintf(a2,"%d",quads[i]->addr2.contents.val);
 				break;
 			case DouConst:
-				sprintf(a2,"%f",quads[i].addr2.contents.dval);
+				sprintf(a2,"%f",quads[i]->addr2.contents.dval);
 				break;
 			case String:
-				a2 = strdup(quads[i].addr2.contents.name);
+				a2 = strdup(quads[i]->addr2.contents.name);
 				break;
 			default:
 				break;
 		}
 		
-		switch (quads[i].addr3.kind) 
+		switch (quads[i]->addr3.kind) 
 		{
 			case Empty:
 				a3 = " - ";
 				break;
 			case IntConst:
-				sprintf(a3,"%d",quads[i].addr3.contents.val);
+				sprintf(a3,"%d",quads[i]->addr3.contents.val);
 				break;
 			case DouConst:
-				sprintf(a3,"%f",quads[i].addr3.contents.dval);
+				sprintf(a3,"%f",quads[i]->addr3.contents.dval);
 				break;
 			case String:
-				a3 = strdup(quads[i].addr3.contents.name);
+				a3 = strdup(quads[i]->addr3.contents.name);
 				break;
 			default:
 				break;
 		}
 		
 		
-		printf("(%d,%s,%s,%s)",quads[i].op,a1,a2,a3);
+		printf("(%d,%s,%s,%s)",quads[i]->op,a1,a2,a3);
 		i++;
 	}
 	
+	 
 	return 0;
 }
