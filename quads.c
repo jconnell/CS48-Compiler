@@ -23,6 +23,13 @@ int CG(ast_node n)
 	printf("Called CG\n");
 	
 	Address ar1, ar2, ar3;
+	
+	if (n == NULL)
+	{
+		printf("Error CG called on NULL node\n");
+		return -1;
+	}
+	
 	switch (n->node_type) {
 		
 		// "==" (IS EQUAL TO) operation
@@ -33,12 +40,21 @@ int CG(ast_node n)
 			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
+			if (n->left_child == NULL) {
+				printf("Error child is null\n");
+			}
 			int lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
+			printf("%s the value\n", ar2.contents.name);
+			
 			//right child's result needs to be the other operand
+			if (n->left_child->right_sibling == NULL) {
+				printf("Error left_child->right sibling is null\n");
+			}
 			int rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
+			printf("%s the value\n", ar3.contents.name);
 			
 			return GenQuad(eq, ar1, ar2, ar3);
 			break;
@@ -284,14 +300,15 @@ int CG(ast_node n)
 			
 			return GenQuad(sub, ar1, ar3, ar2);
 			break;
-
+		*/
 		case INT_LITERAL:
-			Address ar1, ar2, ar3;
+			//Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
 			//we are assigning this literal value to ar1
 			ar2.kind = IntConst;
+			printf("n->value.int_value %d \n", n->value.int_value);
 			ar2.contents.val = n->value.int_value;
 			
 			//we don't need ar3
@@ -299,7 +316,8 @@ int CG(ast_node n)
 			
 			return GenQuad(asn, ar1, ar2, ar3);
 			break;
-			
+		
+		/*
 		case DOUBLE_LITERAL:
 			Address ar1, ar2, ar3;
 			ar1.kind = String;
@@ -525,7 +543,7 @@ char *NewTemp()
 	printf("Called NewTemp\n");
 	char *tempName;
 	tempName = malloc(sizeof(char) * 7);
-	sprintf(tempName, "$t%d", tempCount);  //$t#
+	sprintf(tempName, "t%d", tempCount);  //$t#
 	
 	printf("Inserting into Symbol Table\n");
 	InsertIntoSymbolTable(symtab, tempName);
@@ -563,8 +581,10 @@ int main(int argc, char **argv)
 	
 	//OUR CODE AGAIN
 	//create symbol table
-	SymbolTable *symtab = CreateSymbolTable();
+	symtab = CreateSymbolTable();
 	//now we call CG of the root node
+	
+	InsertIntoSymbolTable(symtab, "dog");
 	
 	printf("Calling CG on root node\n");
 	
@@ -576,17 +596,17 @@ int main(int argc, char **argv)
 	//char a2[5];
 	//char a3[5];
 	
-	char* a1;
-	char* a2;
-	char* a3;
+	char* a1 = malloc(sizeof(char) * 100);
+	char* a2 = malloc(sizeof(char) * 100);
+	char* a3 = malloc(sizeof(char) * 100);
 	
 	//SEGFAULT HAPPENING IN FOLLOWING CODE
 	
-	printf("Entering Debug Printing While Loop\n");
+	printf("Entering Debug Printing While Loop - we have %d quads and they are:\n", currentQuad);
 	
-	while(quads[i]->addr1.contents.name != NULL)
+	while(quads[i] != NULL)
 	{
-		printf("entered while\n");
+		//printf("entered while\n");
 		switch (quads[i]->addr1.kind) 
 		{
 			case Empty:
@@ -599,7 +619,9 @@ int main(int argc, char **argv)
 				sprintf(a1,"%f",quads[i]->addr1.contents.dval);
 				break;
 			case String:
-				a1 = strdup(quads[i]->addr1.contents.name);
+				//printf("%s", quads[i]->addr1.contents.name);
+				a1 = quads[i]->addr1.contents.name;
+				//printf("%s", a1);
 				break;
 			default:
 				break;
@@ -617,7 +639,8 @@ int main(int argc, char **argv)
 				sprintf(a2,"%f",quads[i]->addr2.contents.dval);
 				break;
 			case String:
-				a2 = strdup(quads[i]->addr2.contents.name);
+				//printf("%s", quads[i]->addr2.contents.name);
+				a2 = quads[i]->addr2.contents.name;
 				break;
 			default:
 				break;
@@ -635,14 +658,18 @@ int main(int argc, char **argv)
 				sprintf(a3,"%f",quads[i]->addr3.contents.dval);
 				break;
 			case String:
-				a3 = strdup(quads[i]->addr3.contents.name);
+				//printf("%s", quads[i]->addr3.contents.name);
+				a3 = quads[i]->addr3.contents.name;
 				break;
 			default:
 				break;
 		}
 		
-		
-		printf("(%d,%s,%s,%s)",quads[i]->op,a1,a2,a3);
+		//printf("Finished switches, printing quad details\n");
+		//printf("%s",a1);
+		//printf("%s",a2);
+		//printf("%s",a3);
+		printf("(%d,%s,%s,%s)\n",quads[i]->op,a1,a2,a3);
 		i++;
 	}
 	
