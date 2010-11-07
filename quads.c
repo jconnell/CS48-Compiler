@@ -13,8 +13,16 @@
 //GLOBAL VARIABLES
 int currentQuad = -1;		//index into quads
 int tempCount = 0;			//for unique temp names
+
+int goffset = 0;			//global offset for dmem addresses
+int foffset = -4;			//function offset for dmem addresses
+//must remember in function declaration to change foffset back to -4
+
 Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
+
+char namesOfOps[][10] = {"rd", "gt", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
+"lt", "gteq", "lteq", "sym"}; 
 
 //Actually creates the quads by recursing;
 //We will return the quad that was the last result or -1 if we have no result
@@ -23,6 +31,10 @@ int CG(ast_node n)
 	printf("Called CG\n");
 	
 	Address ar1, ar2, ar3;
+	int lrp, rrp;
+	SymNode *sn;
+	
+	ast_node x;
 	
 	if (n == NULL)
 	{
@@ -37,13 +49,13 @@ int CG(ast_node n)
 			printf("In OP_EQUALS Case\n");
 			//Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
 			
 			//left result needs to be put in
 			if (n->left_child == NULL) {
 				printf("Error child is null\n");
 			}
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			printf("%s the value\n", ar2.contents.name);
@@ -52,118 +64,116 @@ int CG(ast_node n)
 			if (n->left_child->right_sibling == NULL) {
 				printf("Error left_child->right sibling is null\n");
 			}
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			printf("%s the value\n", ar3.contents.name);
 			
 			return GenQuad(eq, ar1, ar2, ar3);
 			break;
 			
+			
+		//ROOT is nothing in itself, so we just start recursing down the tree
 		case ROOT:
 			printf("In ROOT case\n");
 			CG(n->left_child);
 			break;
 
 			
-/*		// "!=" (IS NOT EQUAL TO) operation
+		// "!=" (IS NOT EQUAL TO) operation
 		case OP_NOT_EQUALS:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
-			return GenQuad(neq, ar1, ar2, ar3)
+			return GenQuad(neq, ar1, ar2, ar3);
 			break;
 			
 		// ">" (GREATER THAN) operation
 		case OP_GREATER_THAN:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
-			return GenQuad(gt, ar1, ar2, ar3)
+			return GenQuad(gt, ar1, ar2, ar3);
 			break;
 		
 		// "<" (LESS THAN) operation
 		case OP_LESS_THAN:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
-			return GenQuad(lt, ar1, ar2, ar3)
+			return GenQuad(lt, ar1, ar2, ar3);
 			break;
 			
 		// ">=" (GREATER THAN OR EQUAL TO) operation
 		case OP_GREATER_EQUALS:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
-			return GenQuad(gteq, ar1, ar2, ar3)
+			return GenQuad(gteq, ar1, ar2, ar3);
 			break;
 			
 		// "<=" (LESS THAN OR EQUAL TO) operation
 		case OP_LESS_EQUALS:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
-			return GenQuad(lteq, ar1, ar2, ar3)
+			return GenQuad(lteq, ar1, ar2, ar3);
 			break;
-			
+		
+			/*
 		// "||" (OR) operation
 		case OP_OR:
 			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			GenQuad(assn, ar1, lrp, NULL);
 			GenQuad(ifTrue, ar1, ?, NULL);
 			
 			ar2.kind = String;
 			ar2.contents.name = NewTemp();
 			
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			GenQuad(assn, ar2, rrp, NULL);
 			GenQuad(ifTrue, ar2, ?, NULL);
 			
@@ -182,14 +192,14 @@ int CG(ast_node n)
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			GenQuad(assn, ar1, lrp, NULL);
 			GenQuad(ifFalse, ar1, ?, NULL);
 			
 			ar2.kind = String;
 			ar2.contents.name = NewTemp();
 			
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			GenQuad(assn, ar2, rrp, NULL);
 			GenQuad(ifFalse, ar2, ?, NULL);
 			
@@ -201,84 +211,80 @@ int CG(ast_node n)
 			GenQuad(assn, ar3, 0, NULL);
 			
 			break;
-		
+			 
+			 */
+
 		//Dave adds new cases BELOW here, Jon ABOVE
 			
 		//if it's a SEQ, we want to just recursively produce code for all the children
 		case SEQ:
 			//adapted from THC if code
-			ast_node x = n->left_child;
-			while (x != null) {
+			EnterScope(symtab);
+			x = n->left_child;
+			while (x != NULL) {
 				CG(x);
 				x = x->right_sibling;
 			}
+			LeaveScope(symtab);
 			break;
-		
-		//ROOT is nothing in itself, so we just start recursing down the tree
-		case ROOT:
-			CG(n->left_child);
-			break;
+
 		
 		//Here we do the addition and then we return the position so higher up nodes can find the result
 		case OP_PLUS:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(add, ar1, ar2, ar3);
 			break;
 			
 		case OP_MINUS:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(sub, ar1, ar2, ar3);
 			break;
 			
 		case OP_TIMES:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(mul, ar1, ar2, ar3);
 			break;
 			
 		case OP_DIVIDE:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//right child's result needs to be the other operand
-			int rrp = CG(n->left_child->right_sibling);
+			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
 			
 			return GenQuad(divi, ar1, ar2, ar3);
@@ -286,12 +292,11 @@ int CG(ast_node n)
 
 		//negate a number
 		case OP_NEGATIVE:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
 			//this should only have one child
-			int lrp = CG(n->left_child);
+			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
 			//we need to subtract from 0
@@ -300,7 +305,7 @@ int CG(ast_node n)
 			
 			return GenQuad(sub, ar1, ar3, ar2);
 			break;
-		*/
+		
 		case INT_LITERAL:
 			//Address ar1, ar2, ar3;
 			ar1.kind = String;
@@ -317,9 +322,8 @@ int CG(ast_node n)
 			return GenQuad(asn, ar1, ar2, ar3);
 			break;
 		
-		/*
+		
 		case DOUBLE_LITERAL:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
@@ -348,18 +352,38 @@ int CG(ast_node n)
 			return GenQuad(asn, ar1, ar2, ar3);
 			break;
 			
+			
+		
 		//we must insert in the symbol table the child's name
 		case INT_DEC:
-			InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			lrp = CG(n->left_child);
+			ar1 = quads[lrp]->addr1;
+			
+			ar2.kind = Empty;
+			
+			ar3.kind = Empty;
+			
+			SymNode * sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
+			SetTypeAttr(sn, IntT);
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
+			
 			break;
 		
 		//we must insert the child in the symbol table
 		case DOU_DEC:
-			InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			lrp = CG(n->left_child);
+			ar1 = quads[lrp]->addr1;
+			
+			ar2.kind = Empty;
+			
+			ar3.kind = Empty;
+			
+			SymNode * sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
+			SetTypeAttr(sn, DouT);
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double
 			break;
-			
+		
+		/*	
 		case INT_ARRAY_DEC:
 			InsertIntoSymbolTable(symtab, n->left_child->value.string);
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int array
@@ -443,12 +467,12 @@ int CG(ast_node n)
 			nq.contents.val = NextQuad();
 			PatchQuad(testq, 2, nq);
 			break;
-			
+			*/
 		//the assembler has a built in read facility, so this is very simple
 		//NEED TO DEAL WITH DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's ATTRIBUTE
 		case READ:
-			Address ar1, ar2, ar3;
-			ar1.kind = IntConst;
+			lrp = CG(n->left_child);
+			ar1 = quads[lrp]->addr1;
 			
 			ar2.kind = Empty;
 			
@@ -465,9 +489,8 @@ int CG(ast_node n)
 		//the assembler has a built in write facility, so this is very simple
 		//NEED TO HANDLE DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's TYPE ATTRIBUTE
 		case WRITE:
-			Address ar1, ar2, ar3;
-			ar1.kind = IntConst;
-			ar1.contents.val = n->left_child->value.int_value;
+			lrp = CG(n->left_child);
+			ar1 = quads[lrp]->addr1;
 			
 			ar2.kind = Empty;
 			
@@ -477,10 +500,37 @@ int CG(ast_node n)
 			
 			break;
 			
+		//we put in a dummy just so that higher ups can use it, also put in symbol table
+		case ID:
+			ar1.kind = String;
+			ar1.contents.name = n->value.string;
+			
+			ar2.kind = Empty;
+			
+			ar3.kind = Empty;
+			
+			return GenQuad(sym, ar1, ar2, ar3);
+			break;
+			
+			//we put in a dummy just so that higher ups can use it, also put in symbol table
+		case OP_ASSIGN:
+			//left result needs to be put in
+			lrp = CG(n->left_child);
+			ar1 = quads[lrp]->addr1;
+			
+			//right child's result needs to be the other operand
+			rrp = CG(n->left_child->right_sibling);
+			ar2 = quads[rrp]->addr1;
+			
+			ar3.kind = Empty;
+			
+			return GenQuad(asn, ar1, ar2, ar3);
+			break;
+			
 		//MISSING CONST, RETURN, SWITCH, BREAK, CONTINUE
 		//RETURN NEEDS TO GO TOGETHER WITH FUNCTIONS I THINK...  MAYBE WE NEED TO TYPE CHECK WITH ANOTHER
 			//SWITCH WITHIN THE CASE OF A FUNCTION CALL
-*/
+
 		default:
 			break;
 	}
@@ -538,15 +588,26 @@ int NextQuad()
 }
 
 //adds a new temp to the symbol table and return its name
-char *NewTemp()
+char *NewTemp(int siz)
 {
 	printf("Called NewTemp\n");
 	char *tempName;
 	tempName = malloc(sizeof(char) * 7);
-	sprintf(tempName, "t%d", tempCount);  //$t#
+	sprintf(tempName, "$t%d", tempCount);  //$t#
 	
 	printf("Inserting into Symbol Table\n");
-	InsertIntoSymbolTable(symtab, tempName);
+	SymNode *thesn = InsertIntoSymbolTable(symtab, tempName);
+	
+	if (thesn->level == 1) {
+		SetOffsetAttr(thesn, goffset-siz);
+		goffset -= siz;
+	}
+	else {
+		SetOffsetAttr(thesn, foffset-siz);
+		foffset -= siz;
+	}
+
+	
 	
 	tempCount++;			//so next one has unique name
 	
@@ -669,7 +730,7 @@ int main(int argc, char **argv)
 		//printf("%s",a1);
 		//printf("%s",a2);
 		//printf("%s",a3);
-		printf("(%d,%s,%s,%s)\n",quads[i]->op,a1,a2,a3);
+		printf("(%s,%s,%s,%s)\n",namesOfOps[quads[i]->op],a1,a2,a3);
 		i++;
 	}
 	

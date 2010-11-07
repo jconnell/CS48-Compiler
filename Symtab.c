@@ -22,6 +22,7 @@ static SymNode *CreateSymNode(char *name) {
 	node->attrs->type = None;
 	node->attrs->v.iaaddr = NULL;
 	node->attrs->flags = 0;
+	node->attrs->memoffset = 0;
 	return node;
 }
 
@@ -77,6 +78,16 @@ void SetValueAttr(SymNode *node, value v)
 value GetValueAttr(SymNode *node)
 {
 	return node->attrs->v;
+}
+
+void SetOffsetAttr(SymNode *node, int o)
+{
+	node->attrs->memoffset = o;
+}
+
+int GetOffsetAttr(SymNode *node)
+{
+	return node->attrs->memoffset;
 }
 
 

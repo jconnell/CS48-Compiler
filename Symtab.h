@@ -37,6 +37,7 @@ struct NodeAttrs {
 					 p = int *; q = double *; c = char* (for string literals)
 					 f = function; u = undeclared type*/
 	value v;			/*the value associated with the symbol*/
+	int memoffset;		/*where is it in dmem*/
 	int flags;		/*is it a constant, static, etc*/	
 };
 
@@ -110,5 +111,7 @@ void SetFlagsAttr(SymNode *node, int f);
 int GetFlagsAttr(SymNode *node);
 void SetValueAttr(SymNode *node, value v);
 value GetValueAttr(SymNode *node);
+void SetOffsetAttr(SymNode *node, int o);
+int GetOffsetAttr(SymNode *node);
 
 #endif
