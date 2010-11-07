@@ -10,8 +10,8 @@
 
 //Going with modified versions of the Louden book's suggested quad structure
 
-typedef enum {rd, gt, if_f, asn, lab, mul, divi, add, sub, eq, wri, halt, neq,
-	lt, gteq, lteq} OpKind;
+typedef enum {rd, gotoq, if_f, asn, lab, mul, divi, add, sub, eq, wri, halt, neq,
+	lt, gt, gteq, lteq, sym} OpKind;
 
 typedef enum {Empty, IntConst, DouConst, String} AddrKind;
 

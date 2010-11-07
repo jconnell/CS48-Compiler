@@ -21,8 +21,8 @@ int foffset = -4;			//function offset for dmem addresses
 Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
-char namesOfOps[][10] = {"rd", "gt", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
-"lt", "gteq", "lteq", "sym"}; 
+char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
+"lt", "gt", "gteq", "lteq", "sym"}; 
 
 //Actually creates the quads by recursing;
 //We will return the quad that was the last result or -1 if we have no result
@@ -30,8 +30,9 @@ int CG(ast_node n)
 {
 	printf("Called CG\n");
 	
-	Address ar1, ar2, ar3;
+	Address ar1, ar2, ar3, tqa, ta, topatch, e, nq;
 	int lrp, rrp;
+	int tq, t, testq, gq;
 	SymNode *sn;
 	
 	ast_node x;
@@ -113,6 +114,7 @@ int CG(ast_node n)
 		
 		// "<" (LESS THAN) operation
 		case OP_LESS_THAN:
+			printf("LESS THAN Case in CG\n");
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
 			
@@ -159,12 +161,12 @@ int CG(ast_node n)
 			return GenQuad(lteq, ar1, ar2, ar3);
 			break;
 		
-			/*
+/*
 		// "||" (OR) operation
 		case OP_OR:
 			Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
 			
 			lrp = CG(n->left_child);
 			GenQuad(assn, ar1, lrp, NULL);
@@ -211,8 +213,8 @@ int CG(ast_node n)
 			GenQuad(assn, ar3, 0, NULL);
 			
 			break;
+*/			 
 			 
-			 */
 
 		//Dave adds new cases BELOW here, Jon ABOVE
 			
@@ -231,6 +233,7 @@ int CG(ast_node n)
 		
 		//Here we do the addition and then we return the position so higher up nodes can find the result
 		case OP_PLUS:
+			printf("OP_PLUS Case in CG\n");
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
@@ -261,6 +264,7 @@ int CG(ast_node n)
 			break;
 			
 		case OP_TIMES:
+			printf("OP_TIMES Case in CG\n");
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
@@ -307,6 +311,7 @@ int CG(ast_node n)
 			break;
 		
 		case INT_LITERAL:
+			printf("INT_LITERAL Case in CG\n");
 			//Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
@@ -324,6 +329,7 @@ int CG(ast_node n)
 		
 		
 		case DOUBLE_LITERAL:
+			printf("DOUBLE_LITERAL Case in CG\n");
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
@@ -338,7 +344,6 @@ int CG(ast_node n)
 			break;
 			
 		case STRING_LITERAL:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp();
 			
@@ -356,6 +361,7 @@ int CG(ast_node n)
 		
 		//we must insert in the symbol table the child's name
 		case INT_DEC:
+			printf("INT_DEC Case in CG\n");
 			lrp = CG(n->left_child);
 			ar1 = quads[lrp]->addr1;
 			
@@ -363,14 +369,20 @@ int CG(ast_node n)
 			
 			ar3.kind = Empty;
 			
-			SymNode * sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
+			//going to insert into symbol table
+			printf("inserting int dec id into sym table \n");
+			printf("%s is the symbol going in\n", ar1.contents.name);
+			sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
+			printf("Setting type attribute for that\n");
 			SetTypeAttr(sn, IntT);
+			printf("Set type successfully\n");
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
 			
 			break;
 		
 		//we must insert the child in the symbol table
 		case DOU_DEC:
+			printf("DOU_DEC Case in CG\n");
 			lrp = CG(n->left_child);
 			ar1 = quads[lrp]->addr1;
 			
@@ -378,7 +390,7 @@ int CG(ast_node n)
 			
 			ar3.kind = Empty;
 			
-			SymNode * sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
+			sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
 			SetTypeAttr(sn, DouT);
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double
 			break;
@@ -397,40 +409,80 @@ int CG(ast_node n)
 			//WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
 			//A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
 			break;
-			
-		case DOU_ARRAY_DEC:
-			InsertIntoSymbolTable(symtab, n->left_child->value.string);
-			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double array
-			//WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
-			//A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
-			break;
+		*/	
 
-		//adapted from THC's code in class
-		//MUST TYPE CHECK THAT t RETURNS AN INT FOR COMPARISON
-		case WHILE_LOOP:
-			int tq = NextQuad();
-			int t = CG(n->left_child);
+		
+		case IF:
+			printf("IF Case in CG\n");
+			t = CG(n->left_child);
 			
-			Address tqa;
-			tqa.kind = IntConst;
-			tqa.contents.val = tq;
+			ta = quads[t]->addr1;
 			
-			Address ta = quads[t].addr1;
-			
-			Address topatch;
 			topatch.kind = Empty;
 			
-			Address e;
 			e.kind = Empty;
 			
 			//this is where we would switch the order for the dowhile
-			int testq = GenQuad(if_f, ta, topatch, e);
+			testq = GenQuad(if_f, ta, topatch, e);
 			
 			CG(n->left_child->right_sibling);
 			
-			GenQuad(gt, tqa, e, e);
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(testq, 2, nq);
+			break;
+		
+		case IF_ELSE:
+			printf("IF_ELSE Case in CG\n");
+			t = CG(n->left_child);
 			
-			Address nq;
+			ta = quads[t]->addr1;
+			
+			topatch.kind = Empty;
+			
+			e.kind = Empty;
+			
+			//this is where we would switch the order for the dowhile
+			testq = GenQuad(if_f, ta, topatch, e);
+			
+			CG(n->left_child->right_sibling);
+			gq = GenQuad(gotoq, e, e, e);
+			
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(testq, 2, nq);
+					
+			CG(n->left_child->right_sibling->right_sibling);
+					
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(gq, 1, nq);
+			
+			break;
+		
+		//adapted from THC's code in class
+		//MUST TYPE CHECK THAT t RETURNS AN INT FOR COMPARISON
+		case WHILE_LOOP:
+			printf("WHILE Case in CG\n");
+			tq = NextQuad();
+			t = CG(n->left_child);
+			
+			tqa.kind = IntConst;
+			tqa.contents.val = tq;
+			
+			ta = quads[t]->addr1;
+			
+			topatch.kind = Empty;
+			
+			e.kind = Empty;
+			
+			//this is where we would switch the order for the dowhile
+			testq = GenQuad(if_f, ta, topatch, e);
+			
+			CG(n->left_child->right_sibling);
+			
+			GenQuad(gotoq, tqa, e, e);
+			
 			nq.kind = IntConst;
 			nq.contents.val = NextQuad();
 			PatchQuad(testq, 2, nq);
@@ -439,46 +491,46 @@ int CG(ast_node n)
 		//we're still assuming the comparison is the left child
 		//not the left child->right sibling
 		case DO_WHILE_LOOP:
-			int tq = NextQuad();
-			int t = CG(n->left_child);
+			tq = NextQuad();
+			t = CG(n->left_child);
 			
 			//just do the other stuff first and then we potentially loop or leave
 			CG(n->left_child->right_sibling);
 			
-			Address tqa;
 			tqa.kind = IntConst;
 			tqa.contents.val = tq;
 			
-			Address ta = quads[t].addr1;
+			ta = quads[t]->addr1;
 			
-			Address topatch;
 			topatch.kind = Empty;
 			
-			Address e;
 			e.kind = Empty;
 			
 			//this is where we would switch the order for the dowhile
-			int testq = GenQuad(if_f, ta, topatch, e);
+			testq = GenQuad(if_f, ta, topatch, e);
 			
-			GenQuad(gt, tqa, e, e);
+			GenQuad(gotoq, tqa, e, e);
 			
-			Address nq;
 			nq.kind = IntConst;
 			nq.contents.val = NextQuad();
 			PatchQuad(testq, 2, nq);
 			break;
-			*/
+			
 		//the assembler has a built in read facility, so this is very simple
 		//NEED TO DEAL WITH DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's ATTRIBUTE
 		case READ:
+			printf("READ Case in CG\n");
 			lrp = CG(n->left_child);
+			printf("read back in for real\n");
 			ar1 = quads[lrp]->addr1;
+			
+			printf("read back in\n");
 			
 			ar2.kind = Empty;
 			
 			ar3.kind = Empty;
 			
-			int gq = GenQuad(rd, ar1, ar2, ar3);
+			gq = GenQuad(rd, ar1, ar2, ar3);
 			
 			//PUT VALUE IN SYMBOL TABLE UNDER READ's CHILD
 			
@@ -489,6 +541,7 @@ int CG(ast_node n)
 		//the assembler has a built in write facility, so this is very simple
 		//NEED TO HANDLE DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's TYPE ATTRIBUTE
 		case WRITE:
+			printf("WRITE Case in CG\n");
 			lrp = CG(n->left_child);
 			ar1 = quads[lrp]->addr1;
 			
@@ -502,12 +555,28 @@ int CG(ast_node n)
 			
 		//we put in a dummy just so that higher ups can use it, also put in symbol table
 		case ID:
+			printf("ID Case in CG\n");
+			
+			ar1.contents.name = strdup(n->value.string);
+			
+			printf("%s is the id\n", ar1.contents.name);
+			
+			printf("tried strdup\n");
+			//if (ar1.contents.name == NULL) {
+		//		printf("NULL STRING?!\n");
+		//	}
+			
+			printf("%s is the id\n", ar1.contents.name);
+			
 			ar1.kind = String;
-			ar1.contents.name = n->value.string;
+			//ar1.contents.name = n->value.string;
+			//printf("%s is the id", n->value.string);
 			
 			ar2.kind = Empty;
 			
 			ar3.kind = Empty;
+			
+			
 			
 			return GenQuad(sym, ar1, ar2, ar3);
 			break;
@@ -558,6 +627,77 @@ int GenQuad(OpKind o, Address a, Address b, Address c)
 	//add it to the array
 	quads[currentQuad] = q;
 	
+	
+	//DEBUG
+	char* a1 = malloc(sizeof(char) * 100);
+	char* a2 = malloc(sizeof(char) * 100);
+	char* a3 = malloc(sizeof(char) * 100);
+	switch (q->addr1.kind) 
+	{
+		case Empty:
+			a1 = " - ";
+			break;
+		case IntConst:
+			sprintf(a1,"%d",q->addr1.contents.val);
+			break;
+		case DouConst:
+			sprintf(a1,"%f",q->addr1.contents.dval);
+			break;
+		case String:
+			//printf("%s", quads[i]->addr1.contents.name);
+			a1 = q->addr1.contents.name;
+			//printf("%s", a1);
+			break;
+		default:
+			break;
+	}
+	
+	switch (q->addr2.kind) 
+	{
+		case Empty:
+			a2 = " - ";
+			break;
+		case IntConst:
+			sprintf(a2,"%d",q->addr2.contents.val);
+			break;
+		case DouConst:
+			sprintf(a2,"%f",q->addr2.contents.dval);
+			break;
+		case String:
+			//printf("%s", quads[i]->addr2.contents.name);
+			a2 = q->addr2.contents.name;
+			break;
+		default:
+			break;
+	}
+	
+	switch (q->addr3.kind) 
+	{
+		case Empty:
+			a3 = " - ";
+			break;
+		case IntConst:
+			sprintf(a3,"%d",q->addr3.contents.val);
+			break;
+		case DouConst:
+			sprintf(a3,"%f",q->addr3.contents.dval);
+			break;
+		case String:
+			//printf("%s", quads[i]->addr3.contents.name);
+			a3 = q->addr3.contents.name;
+			break;
+		default:
+			break;
+	}
+	
+	//printf("Finished switches, printing quad details\n");
+	//printf("%s",a1);
+	//printf("%s",a2);
+	//printf("%s",a3);
+	printf("(%s,%s,%s,%s)\n",namesOfOps[q->op],a1,a2,a3);
+
+	//END DEBUG
+	
 	return currentQuad;
 }
 
@@ -590,12 +730,12 @@ int NextQuad()
 //adds a new temp to the symbol table and return its name
 char *NewTemp(int siz)
 {
-	printf("Called NewTemp\n");
+	//printf("Called NewTemp\n");
 	char *tempName;
 	tempName = malloc(sizeof(char) * 7);
 	sprintf(tempName, "$t%d", tempCount);  //$t#
 	
-	printf("Inserting into Symbol Table\n");
+	//printf("Inserting into Symbol Table\n");
 	SymNode *thesn = InsertIntoSymbolTable(symtab, tempName);
 	
 	if (thesn->level == 1) {
@@ -611,7 +751,7 @@ char *NewTemp(int siz)
 	
 	tempCount++;			//so next one has unique name
 	
-	printf("Leaving NewTemp\n");
+	//printf("Leaving NewTemp\n");
 	return tempName;
 }
 
@@ -620,7 +760,7 @@ int main(int argc, char **argv)
 {
 	//generate the array of quads (okay we have a limit of 10,000 - we really don't think people
 	//in C48 will get beyond this using our compiler - consider it a "compiler limit"
-	quads = malloc(10000 * sizeof(Quad *));
+	quads = calloc(10000, sizeof(Quad *));
 	
 	//CODE FROM THC's ast.c
 	if (argc != 2) {
@@ -657,9 +797,7 @@ int main(int argc, char **argv)
 	//char a2[5];
 	//char a3[5];
 	
-	char* a1 = malloc(sizeof(char) * 100);
-	char* a2 = malloc(sizeof(char) * 100);
-	char* a3 = malloc(sizeof(char) * 100);
+	
 	
 	//SEGFAULT HAPPENING IN FOLLOWING CODE
 	
@@ -667,6 +805,10 @@ int main(int argc, char **argv)
 	
 	while(quads[i] != NULL)
 	{
+		char* a1 = malloc(sizeof(char) * 15);
+		char* a2 = malloc(sizeof(char) * 15);
+		char* a3 = malloc(sizeof(char) * 15);
+		printf("Printing quad %d", i);
 		//printf("entered while\n");
 		switch (quads[i]->addr1.kind) 
 		{
