@@ -35,32 +35,111 @@ void AssemblyGen(Quad* quads, FILE* file) {//, SymbolTable* symtab) {
 	SymNode s1, s2, s3;
 	
 	while (i == 0) {
-		if (quads->addr1.kind == String) { // Check Symbol Table
-			s1 = LookupInSymbolTable(symtab, quads->addr1->contents->name);
-			if (s1->attrs->type == IntT) {
-			
+		s1 = LookupInSymbolTable(symtab, quads->addr1->contents->name);
+		s2 = LookupInSymbolTable(symtab, quads->addr2->contents->name);
+		s3 = LookupInSymbolTable(symtab, quads->addr3->contents->name);
+		
+		
+		if (quads->addr2.kind == String) {
+			if (s2->attrs->type == IntT) {
+				if (quads->addr3.kind == String) {
+					if (s3->attrs->type == IntT) {
+					}
+					else if (s3->attrs->type == DouT) {
+					}
+					else {
+					}
+				}
+				else if (quads->addr3.kind == IntConst) {
+				}
+				else if (quads->addr3.kind == DouConst) {
+				}
+				else {
+				}
 			}
-			else if (s1->attrs->type == DouT) {
-				
+			else if (s2->attrs->type == DouT) {
+				if (quads->addr3.kind == String) {
+					if (s3->attrs->type == IntT) {
+					}
+					else if (s3->attrs->type == DouT) {
+					}
+					else {
+					}
+				}
+				else if (quads->addr3.kind == IntConst) {
+				}
+				else if (quads->addr3.kind == DouConst) {
+				}
+				else {
+				}
+			}
+			else {
 			}
 		}
+		else if (quads->addr2.kind == IntConst) {
+			if (quads->addr3.kind == String) {
+				if (s3->attrs->type == IntT) {
+				}
+				else if (s3->attrs->type == DouT) {
+				}
+				else {
+				}
+			}
+			else if (quads->addr3.kind == IntConst) {
+			}
+			else if (quads->addr3.kind == DouConst) {
+			}
+			else {
+			}
+		}
+		else if (quads->addr2.kind == DouConst) {
+			if (quads->addr3.kind == String) {
+				if (s3->attrs->type == IntT) {
+				}
+				else if (s3->attrs->type == DouT) {
+				}
+				else {
+				}
+			}
+			else if (quads->addr3.kind == IntConst) {
+			}
+			else if (quads->addr3.kind == DouConst) {
+			}
+			else {
+			}
+		}
+		else {
+		}
+	
+		
+			
+				
+					
 		
 		if (quads->addr2.kind == String) { // Check Symbol Table
-			s2 = LookupInSymbolTable(symtab, quads->addr2->contents->name);
+			
 			if (s2->attrs->type == IntT) {
 				
 			}
 			else if (s2->attrs->type == DouT) {
-				
+				fprintf("LD 0, %d(5)\n", s2->attrs->memoffset);
 			}
 		}
 		
 		if (quads->addr3.kind == String) { // Check Symbol Table
-			s3 = LookupInSymbolTable(symtab, quads->addr3->contents->name);
 			if (s3->attrs->type == IntT) {
 				
 			}
 			else if (s3->attrs->type == DouT) {
+				
+			}
+		}
+		
+		if (quads->addr1.kind == String) { // Check Symbol Table
+			if (s1->attrs->type == IntT) {
+				
+			}
+			else if (s1->attrs->type == DouT) {
 				
 			}
 		}
@@ -87,11 +166,6 @@ void AssemblyGen(Quad* quads, FILE* file) {//, SymbolTable* symtab) {
 				printf("DERP");
 				
 				
-				
-				//case /*SUB*/:
-				//case /*DIV*/:
-				//case /*MUL*/:
-				//default:
 		}
 		i++;
 	}
