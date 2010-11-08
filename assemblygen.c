@@ -21,14 +21,50 @@
  *
  */
 //GLOBAL VARIABLES
-//int currentQuad = -1;		//index into quads
-//int tempCount = 0;			//for unique temp names
+
 Quad *quads;				//array of Quads
-//SymbolTable *symtab;		//symbol table
 
 void AssemblyGen(Quad* quads, FILE* file) {//, SymbolTable* symtab) {
 	int i = 0;
+	
+	OpKind op = quads->op;
+	Address a1 = quads->addr1;
+	Address a2 = quads->addr2;
+	Address a3 = quads->addr3;
+	
+	SymNode s1, s2, s3;
+	
 	while (i == 0) {
+		if (quads->addr1.kind == String) { // Check Symbol Table
+			s1 = LookupInSymbolTable(symtab, quads->addr1->contents->name);
+			if (s1->attrs->type == IntT) {
+			
+			}
+			else if (s1->attrs->type == DouT) {
+				
+			}
+		}
+		
+		if (quads->addr2.kind == String) { // Check Symbol Table
+			s2 = LookupInSymbolTable(symtab, quads->addr2->contents->name);
+			if (s2->attrs->type == IntT) {
+				
+			}
+			else if (s2->attrs->type == DouT) {
+				
+			}
+		}
+		
+		if (quads->addr3.kind == String) { // Check Symbol Table
+			s3 = LookupInSymbolTable(symtab, quads->addr3->contents->name);
+			if (s3->attrs->type == IntT) {
+				
+			}
+			else if (s3->attrs->type == DouT) {
+				
+			}
+		}
+			
 		switch (quads->op) {
 			case add:
 				if (quads->addr2.kind == IntConst) {
@@ -61,52 +97,12 @@ void AssemblyGen(Quad* quads, FILE* file) {//, SymbolTable* symtab) {
 	}
 }
 
-/*int GenQuad(OpKind o, Address a, Address b, Address c)
-{
-	//make the quad
-	Quad *q = malloc(sizeof(Quad));
-	q->op = o;
-	q->addr1 = a;
-	q->addr2 = b;
-	q->addr3 = c;
-	
-	//currentQuad points to the current index into the array of the last
-	//added quad
-	int currentQuad = -1;
-	currentQuad++;
-	
-	//add it to the array
-	quads[currentQuad] = q;
-	
-	return currentQuad;
-}
-
-char *NewTemp()
-{
-	printf("Called NewTemp\n");
-	char *tempName;
-	tempName = malloc(sizeof(char) * 7);
-	sprintf(tempName, "t%d", tempCount);  //$t#
-	
-	printf("Inserting into Symbol Table\n");
-	InsertIntoSymbolTable(symtab, tempName);
-	
-	tempCount++;			//so next one has unique name
-	
-	printf("Leaving NewTemp\n");
-	return tempName;
-}*/
-
 
 int main() {
 	quads = malloc(sizeof(Quad *));
 	
 	FILE *file;
 	file = fopen("tm48code.txt","a+");
-	
-	//char* a1 = malloc(sizeof(char) * 100);
-	//char* a2 = malloc(sizeof(char) * 100);
-	//char* a3 = malloc(sizeof(char) * 100);
 	
 	Address a;
 	Address b;
