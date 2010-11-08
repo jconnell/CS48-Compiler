@@ -123,7 +123,7 @@ static struct token_lookup token_table[] = {
 	{ "NEG", OP_NEGATIVE },
 	{ "&&", OP_AND },
 	{ "||", OP_OR },
-	{ "RETURN", RETURN },
+	{ "RETURNS", RETURN_S },
 	{ "READ", READ },
 	{ "WRITE", WRITE },
 	{ "INT", INT_DEC},
