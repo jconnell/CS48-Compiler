@@ -1,4 +1,4 @@
-* quads.c
+/* quads.c
 * Basic quad fucntions and code generation
 * Written by DK and JC for CS 48.
 */
