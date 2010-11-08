@@ -6,6 +6,9 @@
 
 #include "ast.h"
 #include "quads.h"
+#include "Symtab.h"
+#include <stdio.h>
+
 
 #ifndef ASSEM_H_
 #define ASSEM_H_
