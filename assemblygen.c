@@ -42,38 +42,65 @@ void AssemblyGen(Quad* quads, FILE* file) {//, SymbolTable* symtab) {
 		
 		if (quads->addr2.kind == String) {
 			if (s2->attrs->type == IntT) {
+				fprintf(file, "LD 0, %d(5)\n", s2->attrs->memoffset);
 				if (quads->addr3.kind == String) {
 					if (s3->attrs->type == IntT) {
+						fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
+						fprintf(file, "ADD 0, 1, 0\n");
 					}
 					else if (s3->attrs->type == DouT) {
+						fprintf(file, "CVTIF 0, 0(0)\n");
+						fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
+						fprintf(file, "ADDF 0, 1, 0\n");
 					}
 					else {
+						fprintf(file, "ERROR\n");
 					}
 				}
 				else if (quads->addr3.kind == IntConst) {
+					fprintf(file, "LDC 1, %d(0)\n", quads->addr3->contents->val);
+					fprintf(file, "ADD 0, 1, 0\n");
 				}
 				else if (quads->addr3.kind == DouConst) {
+					fprintf(file, "CVTIF 0, 0(0)\n");
+					fprintf(file, "LDFC 1, %d(0)\n", quads->addr3->contents->dval);
+					fprintf(file, "ADDF 0, 1, 0\n");
 				}
 				else {
+					fprintf(file, "ERROR\n");
 				}
 			}
 			else if (s2->attrs->type == DouT) {
+				fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
 				if (quads->addr3.kind == String) {
 					if (s3->attrs->type == IntT) {
+						fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
+						fprintf(file, "CVTIF 1, 0(1)\n");
+						fprintf(file, "ADDF 0, 1, 0\n");
 					}
 					else if (s3->attrs->type == DouT) {
+						fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
+						fprintf(file, "ADDF 0, 1, 0\n");
 					}
 					else {
+						fprintf(file, "ERROR\n");
 					}
 				}
 				else if (quads->addr3.kind == IntConst) {
+					fprintf(file, "LDC 1, %d(0)\n", quads->addr3->contents->val);
+					fprintf(file, "CVTIF 1, %d(1)\n", s3->attrs->memoffset);
+					fprintf(file, "ADDF 0, 1, 0\n");
 				}
 				else if (quads->addr3.kind == DouConst) {
+					fprintf(file, "LDFC 1, %d(0)\n", quads->addr3->contents->dval);
+					fprintf(file, "ADDF 0, 1, 0\n");
 				}
 				else {
+					fprintf(file, "ERROR\n");
 				}
 			}
 			else {
+				fprintf(file, "ERROR\n");
 			}
 		}
 		else if (quads->addr2.kind == IntConst) {
