@@ -8,3 +8,6 @@
 #include "quads.h"
 
 typedef enum {math, inequality} AssemKind;
+
+//the main assembly generation function
+void AssemblyGen(Quad** q, FILE* file, SymbolTable* s);

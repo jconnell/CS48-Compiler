@@ -22,11 +22,14 @@
  */
 //GLOBAL VARIABLES
 
-Quad *quads;				//array of Quads
+Quad **quads;				//array of Quads
 SymbolTable *symtab;
 
-void AssemblyGen(Quad* quads, FILE* file, SymbolTable* symtab) {
+void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 	int i = 0;
+	
+	quads = q;
+	symtab = s;
 	
 	OpKind op = quads->op;
 	Address a1 = quads->addr1;
@@ -199,7 +202,7 @@ void AssemblyGen(Quad* quads, FILE* file, SymbolTable* symtab) {
 	}
 }
 
-
+/*
 int main() {
 	quads = malloc(sizeof(Quad *));
 	symtab = CreateSymbolTable();
@@ -232,4 +235,4 @@ int main() {
 	fclose(file);
 	
 }
-
+*/

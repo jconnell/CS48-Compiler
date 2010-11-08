@@ -9,6 +9,7 @@
 #include "quads.h"
 #include "ast.h"
 #include "Symtab.h"
+#include "assemblygen.h"
 
 //GLOBAL VARIABLES
 int currentQuad = -1;		//index into quads
@@ -1102,6 +1103,16 @@ int main(int argc, char **argv)
 		printf("(%s,%s,%s,%s)\n",namesOfOps[quads[i]->op],a1,a2,a3);
 		i++;
 	}
+	
+	//File for final assembly output
+	FILE *file;
+	file = fopen("tm48code.txt","a+");
+	
+	//Send over to the assembly generator, the quads array and symbol table
+	AssemblyGen(quads, file, symtab);
+				
+				
+	fclose(file);
 	
 	 
 	return 0;
