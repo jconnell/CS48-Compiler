@@ -11,7 +11,7 @@
 #include "Symtab.h"
 #include "assemblygen.h"
 
-#define DOASSEMBLY 0
+#define DOASSEMBLY 1
 
 //GLOBAL VARIABLES
 int currentQuad = -1;		//index into quads
@@ -352,13 +352,13 @@ int CG(ast_node n)
 		//if it's a SEQ, we want to just recursively produce code for all the children
 		case SEQ:
 			//adapted from THC if code
-			EnterScope(symtab);
+			//EnterScope(symtab);
 			x = n->left_child;
 			while (x != NULL) {
 				CG(x);
 				x = x->right_sibling;
 			}
-			LeaveScope(symtab);
+			//LeaveScope(symtab);
 			break;
 
 		
