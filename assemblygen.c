@@ -36,12 +36,48 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 	Address a2 = quads[i]->addr2;
 	Address a3 = quads[i]->addr3;
 	
-	SymNode *s1, *s2, *s3;
+	SymNode *s1;
+	SymNode *s2;
+	SymNode *s3;
 	
 	while (i <= 20) {
-		s1 = LookupInSymbolTable(symtab, quads[i]->addr1.contents.name);
-		s2 = LookupInSymbolTable(symtab, quads[i]->addr2.contents.name);
-		s3 = LookupInSymbolTable(symtab, quads[i]->addr3.contents.name);
+		if (quads[i]->addr1.kind == String){
+			s1 = LookupInSymbolTable(symtab, quads[i]->addr1.contents.name);
+			printf(" %s", quads[i]->addr1.contents.name);
+		}
+		else if (quads[i]->addr1.kind == IntConst) {
+			printf(" %d", quads[i]->addr1.contents.val);
+		}
+		else if (quads[i]->addr1.kind == DouConst) {
+			printf(" %f", quads[i]->addr1.contents.dval);
+		}
+		else printf(" - ");
+		
+		if (quads[i]->addr2.kind == String){
+			s2 = LookupInSymbolTable(symtab, quads[i]->addr2.contents.name);
+			printf(" %s", quads[i]->addr2.contents.name);
+			//printf(" %d\n", s2->level);
+		}
+		else if (quads[i]->addr2.kind == IntConst) {
+			printf(" %d", quads[i]->addr2.contents.val);
+		}
+		else if (quads[i]->addr2.kind == DouConst) {
+			printf(" %f", quads[i]->addr2.contents.dval);
+		}
+		else printf(" - ");
+		
+		if (quads[i]->addr3.kind == String){
+			s3 = LookupInSymbolTable(symtab, quads[i]->addr3.contents.name);
+			printf(" %s\n", quads[i]->addr3.contents.name);
+		}
+		else if (quads[i]->addr3.kind == IntConst) {
+			printf(" %d\n", quads[i]->addr3.contents.val);
+		}
+		else if (quads[i]->addr3.kind == DouConst) {
+			printf(" %f\n", quads[i]->addr3.contents.dval);
+		}
+		else printf(" - \n");
+		
 		AssemKind AK;
 		char* AssemCommand = " ";
 		
@@ -62,14 +98,15 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 			AssemCommand = "DIV";
 		}
 		else {
-			AK = math;
+			AK = inequality;
 			AssemCommand = "ERROR";
 		}
 		
-		
+		printf("%d %s %d \n", AK, AssemCommand, quads[i]->op);
 		switch (AK) {
 			case (math):
 				if (quads[i]->addr2.kind == String) {
+					printf("%d\n", s2->attrs->type);
 					if (s2->attrs->type == IntT) {
 						fprintf(file, "LD 0, %d(5)\n", s2->attrs->memoffset);
 						if (quads[i]->addr3.kind == String) {
@@ -92,7 +129,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 						else if (quads[i]->addr3.kind == DouConst) {
 							fprintf(file, "CVTIF 0, 0(0)\n");
-							fprintf(file, "LDFC 1, %lf(0)\n", quads[i]->addr3.contents.dval);
+							fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 						}
 						else {
@@ -100,6 +137,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else if (s2->attrs->type == DouT) {
+						printf("I'm here.\n");
 						fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
 						if (quads[i]->addr3.kind == String) {
 							if (s3->attrs->type == IntT) {
@@ -121,7 +159,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 						}
 						else if (quads[i]->addr3.kind == DouConst) {
-							fprintf(file, "LDFC 1, %lf(0)\n", quads[i]->addr3.contents.dval);
+							fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 						}
 						else {
@@ -129,6 +167,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else {
+						printf("I'm here.\n");
 						fprintf(file, "ERROR\n");
 					}
 				}
@@ -154,7 +193,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					}
 					else if (quads[i]->addr3.kind == DouConst) {
 						fprintf(file, "CVTIF 0, 0(0)\n");
-						fprintf(file, "LDFC 1, %lf(0)\n", quads[i]->addr3.contents.dval);
+						fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 						fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 					}
 					else {
@@ -162,7 +201,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					}
 				}
 				else if (quads[i]->addr2.kind == DouConst) {
-					fprintf(file, "LDFC 0, %lf(0)\n", quads[i]->addr2.contents.dval);
+					fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr2.contents.dval);
 					if (quads[i]->addr3.kind == String) {
 						if (s3->attrs->type == IntT) {
 							fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
@@ -183,7 +222,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 					}
 					else if (quads[i]->addr3.kind == DouConst) {
-						fprintf(file, "LDFC 1, %lf(0)\n", quads[i]->addr3.contents.dval);
+						fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 						fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 					}
 					else {
@@ -193,9 +232,10 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				else {
 					fprintf(file, "ERROR\n");
 				}
+				break;
 			default:
-				printf("DERP");
-				
+				printf("DERP\n");
+				break;
 				
 		}
 		i++;
