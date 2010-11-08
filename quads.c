@@ -1,7 +1,7 @@
-/* quads.c
- * Basic quad fucntions and code generation
- * Written by DK and JC for CS 48.
- */
+* quads.c
+* Basic quad fucntions and code generation
+* Written by DK and JC for CS 48.
+*/
 
 #include <stdlib.h>
 #include <string.h>
@@ -25,7 +25,7 @@ Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
 char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
-"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs"}; 
+	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs"}; 
 
 //Get the wider of the two - int or double
 int MaxType(Address a, Address b)
@@ -88,7 +88,7 @@ int CG(ast_node n)
 	
 	switch (n->node_type) {
 			
-		//we have a function with parameters
+			//we have a function with parameters
 		case FUNC_DEF:
 			printf("In FUNC_DEF Case\n");
 			//add the function name to the symbol table
@@ -120,7 +120,7 @@ int CG(ast_node n)
 			GenQuad(ret, e, e, e);
 			
 			break;
-		
+			
 		case RETURN:
 			printf("In RETURN Case\n");
 			gq = GenQuad(ret, e, e, e);
@@ -133,8 +133,8 @@ int CG(ast_node n)
 			}
 			
 			break;
-		
-		// "==" (IS EQUAL TO) operation
+			
+			// "==" (IS EQUAL TO) operation
 		case OP_EQUALS:
 			printf("In OP_EQUALS Case\n");
 			//Address ar1, ar2, ar3;
@@ -162,14 +162,14 @@ int CG(ast_node n)
 			break;
 			
 			
-		//ROOT is nothing in itself, so we just start recursing down the tree
+			//ROOT is nothing in itself, so we just start recursing down the tree
 		case ROOT:
 			printf("In ROOT case\n");
 			CG(n->left_child);
 			break;
-
 			
-		// "!=" (IS NOT EQUAL TO) operation
+			
+			// "!=" (IS NOT EQUAL TO) operation
 		case OP_NOT_EQUALS:
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
@@ -185,7 +185,7 @@ int CG(ast_node n)
 			return GenQuad(neq, ar1, ar2, ar3);
 			break;
 			
-		// ">" (GREATER THAN) operation
+			// ">" (GREATER THAN) operation
 		case OP_GREATER_THAN:
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
@@ -200,8 +200,8 @@ int CG(ast_node n)
 			
 			return GenQuad(gt, ar1, ar2, ar3);
 			break;
-		
-		// "<" (LESS THAN) operation
+			
+			// "<" (LESS THAN) operation
 		case OP_LESS_THAN:
 			printf("LESS THAN Case in CG\n");
 			ar1.kind = String;
@@ -218,7 +218,7 @@ int CG(ast_node n)
 			return GenQuad(lt, ar1, ar2, ar3);
 			break;
 			
-		// ">=" (GREATER THAN OR EQUAL TO) operation
+			// ">=" (GREATER THAN OR EQUAL TO) operation
 		case OP_GREATER_EQUALS:
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
@@ -234,7 +234,7 @@ int CG(ast_node n)
 			return GenQuad(gteq, ar1, ar2, ar3);
 			break;
 			
-		// "<=" (LESS THAN OR EQUAL TO) operation
+			// "<=" (LESS THAN OR EQUAL TO) operation
 		case OP_LESS_EQUALS:
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
@@ -249,9 +249,9 @@ int CG(ast_node n)
 			
 			return GenQuad(lteq, ar1, ar2, ar3);
 			break;
-		
-
-		// "||" (OR) operation
+			
+			
+			// "||" (OR) operation
 		case OP_OR:
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
@@ -306,8 +306,8 @@ int CG(ast_node n)
 			return rrp;
 			
 			break;
-		
-		// "&&" (AND) operation - based on THC code
+			
+			// "&&" (AND) operation - based on THC code
 		case OP_AND:
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
@@ -393,37 +393,29 @@ int CG(ast_node n)
 			return rrp;
 			break;		 
 			
-			 
-
-
 			
-		//if it's a SEQ, we want to just recursively produce code for all the children
+			
+			
+			
+			//if it's a SEQ, we want to just recursively produce code for all the children
 		case SEQ:
 			//adapted from THC if code
-<<<<<<< HEAD
-			//EnterScope(symtab);
-=======
 			e.kind = Empty;
 			EnterScope(symtab);
 			//we must tell the assembly generator we've entered a new scope
 			GenQuad(ens, e, e, e);
->>>>>>> 1d9b980c58f6e6d8660c364090d75516e0941c04
 			x = n->left_child;
 			while (x != NULL) {
 				CG(x);
 				x = x->right_sibling;
 			}
-<<<<<<< HEAD
-			//LeaveScope(symtab);
-=======
 			GenQuad(exs, e, e, e);
 			//we must tell the assembly generator we've exited a scope
 			LeaveScope(symtab);
->>>>>>> 1d9b980c58f6e6d8660c364090d75516e0941c04
 			break;
-
-		
-		//Here we do the addition and then we return the position so higher up nodes can find the result
+			
+			
+			//Here we do the addition and then we return the position so higher up nodes can find the result
 		case OP_PLUS:
 			printf("OP_PLUS Case in CG\n");
 			ar1.kind = String;
@@ -489,8 +481,8 @@ int CG(ast_node n)
 			
 			return GenQuad(divi, ar1, ar2, ar3);
 			break;
-
-		//negate a number
+			
+			//negate a number
 		case OP_NEGATIVE:
 			ar1.kind = String;
 			
@@ -506,7 +498,7 @@ int CG(ast_node n)
 			
 			return GenQuad(sub, ar1, ar3, ar2);
 			break;
-		
+			
 		case INT_LITERAL:
 			printf("INT_LITERAL Case in CG\n");
 			//Address ar1, ar2, ar3;
@@ -523,8 +515,8 @@ int CG(ast_node n)
 			
 			return GenQuad(asn, ar1, ar2, ar3);
 			break;
-		
-		
+			
+			
 		case DOUBLE_LITERAL:
 			printf("DOUBLE_LITERAL Case in CG\n");
 			ar1.kind = String;
@@ -555,8 +547,8 @@ int CG(ast_node n)
 			break;
 			
 			
-		
-		//we must insert in the symbol table the child's name
+			
+			//we must insert in the symbol table the child's name
 		case INT_DEC:
 			printf("INT_DEC Case in CG\n");
 			lrp = CG(n->left_child);
@@ -585,8 +577,8 @@ int CG(ast_node n)
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
 			
 			break;
-		
-		//we must insert the child in the symbol table
+			
+			//we must insert the child in the symbol table
 		case DOU_DEC:
 			printf("DOU_DEC Case in CG\n");
 			lrp = CG(n->left_child);
@@ -609,23 +601,23 @@ int CG(ast_node n)
 			}
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double
 			break;
-		
-		/*	
-		case INT_ARRAY_DEC:
-			InsertIntoSymbolTable(symtab, n->left_child->value.string);
-			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int array
-			//WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
-			//A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
-			break;
 			
-		case DOU_ARRAY_DEC:
-			InsertIntoSymbolTable(symtab, n->left_child->value.string);
-			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double array
-			//WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
-			//A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
-			break;
-		*/	
-
+			/*	
+			 case INT_ARRAY_DEC:
+			 InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			 //PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int array
+			 //WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
+			 //A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
+			 break;
+			 
+			 case DOU_ARRAY_DEC:
+			 InsertIntoSymbolTable(symtab, n->left_child->value.string);
+			 //PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double array
+			 //WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
+			 //A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
+			 break;
+			 */	
+			
 		case FOR_LOOP:
 			printf("FORLOOP Case in CG\n");
 			
@@ -656,7 +648,7 @@ int CG(ast_node n)
 			PatchQuad(testq, 2, nq);
 			
 			break;
-		
+			
 		case OP_PRE_INCR:
 			printf("PRE++ Case in CG\n");
 			
@@ -670,7 +662,7 @@ int CG(ast_node n)
 			
 			return GenQuad(add, ar2, ar2, ar3);
 			break;
-		
+			
 		case OP_POST_INCR:
 			printf("POST++ Case in CG\n");
 			
@@ -684,7 +676,7 @@ int CG(ast_node n)
 			
 			return GenQuad(add, ar2, ar2, ar3);
 			break;
-		
+			
 		case OP_PRE_DECR:
 			printf("PRE-- Case in CG\n");
 			
@@ -712,7 +704,7 @@ int CG(ast_node n)
 			
 			return GenQuad(sub, ar2, ar2, ar3);
 			break;
-		
+			
 		case IF_ELSE:
 			printf("IF_ELSE Case in CG\n");
 			t = CG(n->left_child);
@@ -732,17 +724,17 @@ int CG(ast_node n)
 			nq.kind = IntConst;
 			nq.contents.val = NextQuad();
 			PatchQuad(testq, 2, nq);
-					
+			
 			CG(n->left_child->right_sibling->right_sibling);
-					
+			
 			nq.kind = IntConst;
 			nq.contents.val = NextQuad();
 			PatchQuad(gq, 1, nq);
 			
 			break;
-		
-		//adapted from THC's code in class
-		//MUST TYPE CHECK THAT t RETURNS AN INT FOR COMPARISON
+			
+			//adapted from THC's code in class
+			//MUST TYPE CHECK THAT t RETURNS AN INT FOR COMPARISON
 		case WHILE_LOOP:
 			printf("WHILE Case in CG\n");
 			tq = NextQuad();
@@ -768,9 +760,9 @@ int CG(ast_node n)
 			nq.contents.val = NextQuad();
 			PatchQuad(testq, 2, nq);
 			break;
-	
-		//we're still assuming the comparison is the left child
-		//not the left child->right sibling
+			
+			//we're still assuming the comparison is the left child
+			//not the left child->right sibling
 		case DO_WHILE_LOOP:
 			tq = NextQuad();
 			t = CG(n->left_child);
@@ -797,8 +789,8 @@ int CG(ast_node n)
 			PatchQuad(testq, 2, nq);
 			break;
 			
-		//the assembler has a built in read facility, so this is very simple
-		//NEED TO DEAL WITH DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's ATTRIBUTE
+			//the assembler has a built in read facility, so this is very simple
+			//NEED TO DEAL WITH DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's ATTRIBUTE
 		case READ:
 			printf("READ Case in CG\n");
 			lrp = CG(n->left_child);
@@ -819,8 +811,8 @@ int CG(ast_node n)
 			
 			break;
 			
-		//the assembler has a built in write facility, so this is very simple
-		//NEED TO HANDLE DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's TYPE ATTRIBUTE
+			//the assembler has a built in write facility, so this is very simple
+			//NEED TO HANDLE DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's TYPE ATTRIBUTE
 		case WRITE:
 			printf("WRITE Case in CG\n");
 			lrp = CG(n->left_child);
@@ -834,7 +826,7 @@ int CG(ast_node n)
 			
 			break;
 			
-		//we put in a dummy just so that higher ups can use it, also put in symbol table
+			//we put in a dummy just so that higher ups can use it, also put in symbol table
 		case ID:
 			printf("ID Case in CG\n");
 			
@@ -844,8 +836,8 @@ int CG(ast_node n)
 			
 			printf("tried strdup\n");
 			//if (ar1.contents.name == NULL) {
-		//		printf("NULL STRING?!\n");
-		//	}
+			//		printf("NULL STRING?!\n");
+			//	}
 			
 			printf("%s is the id\n", ar1.contents.name);
 			
@@ -877,10 +869,10 @@ int CG(ast_node n)
 			return GenQuad(asn, ar1, ar2, ar3);
 			break;
 			
-		//MISSING CONST, RETURN, SWITCH, BREAK, CONTINUE
-		//RETURN NEEDS TO GO TOGETHER WITH FUNCTIONS I THINK...  MAYBE WE NEED TO TYPE CHECK WITH ANOTHER
+			//MISSING CONST, RETURN, SWITCH, BREAK, CONTINUE
+			//RETURN NEEDS TO GO TOGETHER WITH FUNCTIONS I THINK...  MAYBE WE NEED TO TYPE CHECK WITH ANOTHER
 			//SWITCH WITHIN THE CASE OF A FUNCTION CALL
-
+			
 		default:
 			break;
 	}
@@ -976,7 +968,7 @@ int GenQuad(OpKind o, Address a, Address b, Address c)
 	//printf("%s",a2);
 	//printf("%s",a3);
 	printf("(%s,%s,%s,%s)\n",namesOfOps[q->op],a1,a2,a3);
-
+	
 	//END DEBUG
 	
 	return currentQuad;
@@ -1027,7 +1019,7 @@ char *NewTemp(int siz)
 		SetOffsetAttr(thesn, foffset-siz);
 		foffset -= siz;
 	}
-
+	
 	if (siz == 8) {
 		SetTypeAttr(thesn, DouT);
 	}
@@ -1038,7 +1030,7 @@ char *NewTemp(int siz)
 	else {
 		SetTypeAttr(thesn, IntT);
 	}
-
+	
 	
 	tempCount++;			//so next one has unique name
 	
@@ -1175,10 +1167,10 @@ int main(int argc, char **argv)
 		
 		//Send over to the assembly generator, the quads array and symbol table
 		AssemblyGen(quads, file, symtab);
-					
-					
+		
+		
 		fclose(file);
 	}
-	 
+	
 	return 0;
 }
