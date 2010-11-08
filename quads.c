@@ -11,6 +11,8 @@
 #include "Symtab.h"
 #include "assemblygen.h"
 
+#define DOASSEMBLY 0
+
 //GLOBAL VARIABLES
 int currentQuad = -1;		//index into quads
 int tempCount = 0;			//for unique temp names
@@ -1104,16 +1106,18 @@ int main(int argc, char **argv)
 		i++;
 	}
 	
-	//File for final assembly output
-	FILE *file;
-	file = fopen("tm48code.txt","a+");
-	
-	//Send over to the assembly generator, the quads array and symbol table
-	AssemblyGen(quads, file, symtab);
-				
-				
-	fclose(file);
-	
+	if(DOASSEMBLY)
+	{
+		//File for final assembly output
+		FILE *file;
+		file = fopen("tm48code.txt","a+");
+		
+		//Send over to the assembly generator, the quads array and symbol table
+		AssemblyGen(quads, file, symtab);
+					
+					
+		fclose(file);
+	}
 	 
 	return 0;
 }
