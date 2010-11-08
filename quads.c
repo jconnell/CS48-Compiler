@@ -120,13 +120,8 @@ int CG(ast_node n)
 			GenQuad(ret, e, e, e);
 			
 			break;
-<<<<<<< HEAD
 		
 		case RETURN_S:
-=======
-			
-		case RETURN:
->>>>>>> 64b22f2f6ef4c4947e9f3b42077ebae823590281
 			printf("In RETURN Case\n");
 			gq = GenQuad(ret, e, e, e);
 			
