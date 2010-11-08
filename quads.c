@@ -121,7 +121,7 @@ int CG(ast_node n)
 			
 			break;
 		
-		case RETURN:
+		case RETURN_S:
 			printf("In RETURN Case\n");
 			gq = GenQuad(ret, e, e, e);
 			
@@ -484,6 +484,7 @@ int CG(ast_node n)
 
 		//negate a number
 		case OP_NEGATIVE:
+			printf("OP_NEGATIVE Case in CG\n");
 			ar1.kind = String;
 			
 			//this should only have one child
