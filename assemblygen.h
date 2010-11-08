@@ -7,8 +7,8 @@
 #include "ast.h"
 #include "quads.h"
 
-#ifndef QUADS_H_
-#define QUADS_H_
+#ifndef ASSEM_H_
+#define ASSEM_H_
 
 typedef enum {math, inequality} AssemKind;
 
