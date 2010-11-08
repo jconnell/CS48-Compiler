@@ -11,7 +11,7 @@
 #include "Symtab.h"
 #include "assemblygen.h"
 
-#define DOASSEMBLY 0
+#define DOASSEMBLY 1
 
 //GLOBAL VARIABLES
 int currentQuad = -1;		//index into quads
@@ -25,7 +25,7 @@ Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
 char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
-"lt", "gt", "gteq", "lteq", "sym"}; 
+"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs"}; 
 
 //Get the wider of the two - int or double
 int MaxType(Address a, Address b)
@@ -75,16 +75,64 @@ int CG(ast_node n)
 	int tq, t, testq, gq;
 	int typer;
 	SymNode *sn;
+	value v;
 	
 	ast_node x;
 	
 	if (n == NULL)
 	{
 		printf("Error CG called on NULL node\n");
+		
 		return -1;
 	}
 	
 	switch (n->node_type) {
+			
+		//we have a function with parameters
+		case FUNC_DEF:
+			printf("In FUNC_DEF Case\n");
+			//add the function name to the symbol table
+			//
+			
+			e.kind = Empty;
+			
+			//we must reset f-offset for memory management purposes
+			foffset = -4;
+			
+			//this will generate a sym quad which is the start of the function
+			//it's also a dummy quad for integer defintions
+			//we're using it like ENT in this case in Louden
+			lrp = CG(n->left_child);
+			//we expect an ID, so add it to the symbol table
+			sn = InsertIntoSymbolTable(symtab, quads[lrp]->addr1.contents.name);
+			//this is the quad where we'll need to jump if this function is called
+			v.ival = lrp;
+			SetValueAttr(sn, v);
+			//we're going to ignore the parameters as per louden p 441
+			ast_node next = n->left_child->right_sibling;
+			while (next->node_type == FUNC_PARAM) 
+			{
+				next=next->right_sibling;
+			}
+			//now we're done so we should be at the SEQ of actual instructions
+			CG(next);
+			//finish it off with a ret
+			GenQuad(ret, e, e, e);
+			
+			break;
+		
+		case RETURN:
+			printf("In RETURN Case\n");
+			gq = GenQuad(ret, e, e, e);
+			
+			//if we have a return after the statement
+			if(n->left_child != NULL)
+			{
+				lrp = CG(n->left_child);
+				PatchQuad(gq, 1, quads[lrp]->addr1);
+			}
+			
+			break;
 		
 		// "==" (IS EQUAL TO) operation
 		case OP_EQUALS:
@@ -352,12 +400,17 @@ int CG(ast_node n)
 		//if it's a SEQ, we want to just recursively produce code for all the children
 		case SEQ:
 			//adapted from THC if code
+			e.kind = Empty;
 			EnterScope(symtab);
+			//we must tell the assembly generator we've entered a new scope
+			GenQuad(ens, e, e, e);
 			x = n->left_child;
 			while (x != NULL) {
 				CG(x);
 				x = x->right_sibling;
 			}
+			GenQuad(exs, e, e, e);
+			//we must tell the assembly generator we've exited a scope
 			LeaveScope(symtab);
 			break;
 
