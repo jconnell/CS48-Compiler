@@ -137,6 +137,7 @@ static struct token_lookup token_table[] = {
 	{ "SWITCH", SWITCH_ST},
 	{ "BREAK", BREAK_ST},
 	{ "CONTINUE", CONTINUE_ST},
+	{ "SIZEOF", OP_SIZEOF},
 	{ NULL, 0 }
 };
 
@@ -161,6 +162,7 @@ void process_node(ast_node node) {
 		switch (node->node_type) {
 			case ID:  /* get and store the actual id */
 				node->value.string = strdup(get_token());  
+				printf("%s in ast the string val for id", node->value.string);
 				break;
 				
 			case INT_LITERAL:  /* get and store the int literal value */

@@ -24,15 +24,53 @@ SymbolTable *symtab;		//symbol table
 char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
 "lt", "gt", "gteq", "lteq", "sym"}; 
 
+//Get the wider of the two - int or double
+int MaxType(Address a, Address b)
+{
+	printf("Called MaxType\n");
+	SymNode *an;
+	SymNode *bn;
+	if (a.kind == String) 
+	{
+		printf("a.kind is string\n");
+		an = LookupInSymbolTable(symtab, a.contents.name);
+		printf("looked up a\n");
+		typeenum te = GetTypeAttr(an);
+		if (te == DouT)
+			return 8;
+	}
+	
+	if (b.kind == String) 
+	{
+		printf("b.kind is string\n");
+		bn = LookupInSymbolTable(symtab, b.contents.name);
+		typeenum te = GetTypeAttr(bn);
+		if (te == DouT)
+			return 8;
+	}
+	
+	//set the result to the right type
+	if (a.kind == DouConst || b.kind == DouConst) 
+	{
+		return 8;
+	}
+	
+	
+	printf("Finished MaxType\n");
+	
+	return 4;
+}
+
 //Actually creates the quads by recursing;
 //We will return the quad that was the last result or -1 if we have no result
 int CG(ast_node n)
 {
 	printf("Called CG\n");
 	
-	Address ar1, ar2, ar3, tqa, ta, topatch, e, nq;
+	Address ar1, ar2, ar3, ar4, ar5, tqa, ta, topatch, e, nq;
 	int lrp, rrp;
 	int tq, t, testq, gq;
+	int typer;
 	SymNode *sn;
 	
 	ast_node x;
@@ -161,62 +199,152 @@ int CG(ast_node n)
 			return GenQuad(lteq, ar1, ar2, ar3);
 			break;
 		
-/*
+
 		// "||" (OR) operation
 		case OP_OR:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
 			
+			ar2.kind = IntConst;
+			ar2.contents.val = 1;
+			
+			ar3.kind = IntConst;
+			ar3.contents.val = 0;
+			
+			ar4.kind = String;
+			ar4.contents.name = NewTemp(4);
+			
+			e.kind = Empty;
+			
 			lrp = CG(n->left_child);
-			GenQuad(assn, ar1, lrp, NULL);
-			GenQuad(ifTrue, ar1, ?, NULL);
+			ta = quads[lrp]->addr1;
 			
-			ar2.kind = String;
-			ar2.contents.name = NewTemp();
+			gq = GenQuad(if_f, ta, e, e);
 			
-			rrp = CG(n->left_child->right_sibling);
-			GenQuad(assn, ar2, rrp, NULL);
-			GenQuad(ifTrue, ar2, ?, NULL);
+			GenQuad(asn, ar4, ar2, e);
+			typer = GenQuad(gotoq, e, e, e);
 			
-			ar3.kind = String;
-			ar3.contents.name = NewTemp();
+			t = CG(n->left_child->right_sibling);
+			ar5.kind = IntConst;
+			ar5.contents.val = t;
 			
-			GenQuad(assn, ar3, 0, NULL);
-			GenQuad(goto, ?, NULL, NULL);
-			GenQuad(assn, ar3, 1, NULL);
+			ta = quads[t]->addr1;
+			
+			testq = GenQuad(if_f, ta, e, e);
+			
+			GenQuad(asn, ar4, ar2, e);
+			
+			tq = GenQuad(gotoq, e, e, e);
+			
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			
+			PatchQuad(testq, 2, nq);
+			
+			
+			GenQuad(asn, ar4, ar3, e);
+			PatchQuad(typer, 1, nq);
+			PatchQuad(gq, 2, ar5);
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(tq, 1, nq);
+			
+			rrp = GenQuad(asn, ar1, ar4, e);
+			
+			
+			return rrp;
 			
 			break;
-			
-		// "&&" (AND) operation
+		
+		// "&&" (AND) operation - based on THC code
 		case OP_AND:
-			Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
+			
+			ar2.kind = IntConst;
+			ar2.contents.val = 1;
+			
+			ar3.kind = IntConst;
+			ar3.contents.val = 0;
+			
+			ar4.kind = String;
+			ar4.contents.name = NewTemp(4);
+			
+			e.kind = Empty;
 			
 			lrp = CG(n->left_child);
-			GenQuad(assn, ar1, lrp, NULL);
-			GenQuad(ifFalse, ar1, ?, NULL);
+			ta = quads[lrp]->addr1;
 			
-			ar2.kind = String;
-			ar2.contents.name = NewTemp();
+			gq = GenQuad(if_f, ta, e, e);
 			
-			rrp = CG(n->left_child->right_sibling);
-			GenQuad(assn, ar2, rrp, NULL);
-			GenQuad(ifFalse, ar2, ?, NULL);
+			t = CG(n->left_child->right_sibling);
 			
-			ar3.kind = String;
-			ar3.contents.name = NewTemp();
+			ta = quads[t]->addr1;
 			
-			GenQuad(assn, ar3, 1, NULL);
-			GenQuad(goto, ?, NULL, NULL);
-			GenQuad(assn, ar3, 0, NULL);
+			testq = GenQuad(if_f, ta, e, e);
 			
-			break;
-*/			 
+			GenQuad(asn, ar4, ar2, e);
+			
+			tq = GenQuad(gotoq, e, e, e);
+			
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(gq, 2, nq);
+			PatchQuad(testq, 2, nq);
+			
+			GenQuad(asn, ar4, ar3, e);
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(tq, 1, nq);
+			rrp = GenQuad(asn, ar1, ar4, e);
+			
+			
+			
+			return rrp;
+			break;		 
+			
+		case OP_NOT:
+			ar1.kind = String;
+			ar1.contents.name = NewTemp(4);
+			
+			ar2.kind = IntConst;
+			ar2.contents.val = 1;
+			
+			ar3.kind = IntConst;
+			ar3.contents.val = 0;
+			
+			ar4.kind = String;
+			ar4.contents.name = NewTemp(4);
+			
+			e.kind = Empty;
+			
+			t = CG(n->left_child);
+			
+			ta = quads[t]->addr1;
+			
+			//if false go to the end and give it a 0
+			gq = GenQuad(if_f, ta, e, e);
+			GenQuad(asn, ar4, ar2, e);
+			
+			tq = GenQuad(gotoq, e, e, e);
+			
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			PatchQuad(gq, 2, nq);
+			GenQuad(asn, ar4, ar3, e);
+			
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			
+			PatchQuad(tq, 1, nq);
+			rrp = GenQuad(asn, ar1, ar4, e);
+			
+			return rrp;
+			break;		 
+			
 			 
 
-		//Dave adds new cases BELOW here, Jon ABOVE
+
 			
 		//if it's a SEQ, we want to just recursively produce code for all the children
 		case SEQ:
@@ -235,7 +363,6 @@ int CG(ast_node n)
 		case OP_PLUS:
 			printf("OP_PLUS Case in CG\n");
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
 			lrp = CG(n->left_child);
@@ -244,13 +371,14 @@ int CG(ast_node n)
 			//right child's result needs to be the other operand
 			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
+			
+			ar1.contents.name = NewTemp(MaxType(ar2, ar3));
 			
 			return GenQuad(add, ar1, ar2, ar3);
 			break;
 			
 		case OP_MINUS:
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
 			lrp = CG(n->left_child);
@@ -259,6 +387,8 @@ int CG(ast_node n)
 			//right child's result needs to be the other operand
 			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
+			
+			ar1.contents.name = NewTemp(MaxType(ar2, ar3));
 			
 			return GenQuad(sub, ar1, ar2, ar3);
 			break;
@@ -266,7 +396,6 @@ int CG(ast_node n)
 		case OP_TIMES:
 			printf("OP_TIMES Case in CG\n");
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
 			lrp = CG(n->left_child);
@@ -275,13 +404,14 @@ int CG(ast_node n)
 			//right child's result needs to be the other operand
 			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
+			
+			ar1.contents.name = NewTemp(MaxType(ar2, ar3));
 			
 			return GenQuad(mul, ar1, ar2, ar3);
 			break;
 			
 		case OP_DIVIDE:
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
 			
 			//left result needs to be put in
 			lrp = CG(n->left_child);
@@ -290,6 +420,8 @@ int CG(ast_node n)
 			//right child's result needs to be the other operand
 			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
+			
+			ar1.contents.name = NewTemp(MaxType(ar2, ar3));
 			
 			return GenQuad(divi, ar1, ar2, ar3);
 			break;
@@ -297,7 +429,6 @@ int CG(ast_node n)
 		//negate a number
 		case OP_NEGATIVE:
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
 			
 			//this should only have one child
 			lrp = CG(n->left_child);
@@ -307,6 +438,8 @@ int CG(ast_node n)
 			ar3.kind = IntConst;
 			ar3.contents.val = 0;
 			
+			ar1.contents.name = NewTemp(MaxType(ar2, ar3));
+			
 			return GenQuad(sub, ar1, ar3, ar2);
 			break;
 		
@@ -314,7 +447,7 @@ int CG(ast_node n)
 			printf("INT_LITERAL Case in CG\n");
 			//Address ar1, ar2, ar3;
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(4);
 			
 			//we are assigning this literal value to ar1
 			ar2.kind = IntConst;
@@ -331,7 +464,7 @@ int CG(ast_node n)
 		case DOUBLE_LITERAL:
 			printf("DOUBLE_LITERAL Case in CG\n");
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(8);
 			
 			//we are assigning this literal value to ar1
 			ar2.kind = DouConst;
@@ -345,7 +478,7 @@ int CG(ast_node n)
 			
 		case STRING_LITERAL:
 			ar1.kind = String;
-			ar1.contents.name = NewTemp();
+			ar1.contents.name = NewTemp(240);
 			
 			//we are assigning this literal value to ar1
 			ar2.kind = String;
@@ -376,6 +509,15 @@ int CG(ast_node n)
 			printf("Setting type attribute for that\n");
 			SetTypeAttr(sn, IntT);
 			printf("Set type successfully\n");
+			
+			if (sn->level == 1) {
+				SetOffsetAttr(sn, goffset-4);
+				goffset -= 4;
+			}
+			else {
+				SetOffsetAttr(sn, foffset-4);
+				foffset -= 4;
+			}
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
 			
 			break;
@@ -392,6 +534,15 @@ int CG(ast_node n)
 			
 			sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
 			SetTypeAttr(sn, DouT);
+			
+			if (sn->level == 1) {
+				SetOffsetAttr(sn, goffset-4);
+				goffset -= 4;
+			}
+			else {
+				SetOffsetAttr(sn, foffset-4);
+				foffset -= 4;
+			}
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double
 			break;
 		
@@ -411,25 +562,91 @@ int CG(ast_node n)
 			break;
 		*/	
 
-		
-		case IF:
-			printf("IF Case in CG\n");
-			t = CG(n->left_child);
+		case FOR_LOOP:
+			printf("FORLOOP Case in CG\n");
 			
+			//the first statement is always executed
+			CG(n->left_child);
+			
+			//the inequality is statement two
+			t = CG(n->left_child->right_sibling);
 			ta = quads[t]->addr1;
-			
-			topatch.kind = Empty;
-			
-			e.kind = Empty;
-			
-			//this is where we would switch the order for the dowhile
 			testq = GenQuad(if_f, ta, topatch, e);
 			
-			CG(n->left_child->right_sibling);
+			//we do the sequence before the final statement
+			CG(n->left_child->right_sibling->right_sibling->right_sibling);
 			
+			//now we do the third statement in the for-loop header
+			CG(n->left_child->right_sibling->right_sibling);
+			
+			//then we loop around
+			e.kind = Empty;
+			
+			nq.kind = IntConst;
+			nq.contents.val = t;
+			GenQuad(gotoq, nq, e, e);
+			
+			//finally we must patch the inequality		
 			nq.kind = IntConst;
 			nq.contents.val = NextQuad();
 			PatchQuad(testq, 2, nq);
+			
+			break;
+		
+		case OP_PRE_INCR:
+			printf("PRE++ Case in CG\n");
+			
+			//left result needs to be put in
+			lrp = CG(n->left_child);
+			ar2 = quads[lrp]->addr1;
+			
+			//right child's result needs to be the other operand
+			ar3.kind = IntConst;
+			ar3.contents.val = 1;
+			
+			return GenQuad(add, ar2, ar2, ar3);
+			break;
+		
+		case OP_POST_INCR:
+			printf("POST++ Case in CG\n");
+			
+			//left result needs to be put in
+			lrp = CG(n->left_child);
+			ar2 = quads[lrp]->addr1;
+			
+			//right child's result needs to be the other operand
+			ar3.kind = IntConst;
+			ar3.contents.val = 1;
+			
+			return GenQuad(add, ar2, ar2, ar3);
+			break;
+		
+		case OP_PRE_DECR:
+			printf("PRE-- Case in CG\n");
+			
+			//left result needs to be put in
+			lrp = CG(n->left_child);
+			ar2 = quads[lrp]->addr1;
+			
+			//right child's result needs to be the other operand
+			ar3.kind = IntConst;
+			ar3.contents.val = 1;
+			
+			return GenQuad(sub, ar2, ar2, ar3);
+			break;
+			
+		case OP_POST_DECR:
+			printf("POST-- Case in CG\n");
+			
+			//left result needs to be put in
+			lrp = CG(n->left_child);
+			ar2 = quads[lrp]->addr1;
+			
+			//right child's result needs to be the other operand
+			ar3.kind = IntConst;
+			ar3.contents.val = 1;
+			
+			return GenQuad(sub, ar2, ar2, ar3);
 			break;
 		
 		case IF_ELSE:
@@ -747,7 +964,17 @@ char *NewTemp(int siz)
 		foffset -= siz;
 	}
 
-	
+	if (siz == 8) {
+		SetTypeAttr(thesn, DouT);
+	}
+	else if (siz == 240)
+	{
+		SetTypeAttr(thesn, StrT);
+	}
+	else {
+		SetTypeAttr(thesn, IntT);
+	}
+
 	
 	tempCount++;			//so next one has unique name
 	

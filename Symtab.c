@@ -166,7 +166,7 @@ static int HashPJW(char *s, int size) {
 static SymNode *LookupSymHashTable(SymHashTable *hashTable, char *name,
 								   int slot) {
 	
-	printf("LookupSymHashTable called\n");
+	//printf("LookupSymHashTable called\n");
 	SymNode *node;
 	
 	if (slot == NOHASHSLOT)
@@ -223,14 +223,14 @@ void DestroySymbolTable(SymbolTable *symtab) {
  entry.Insert a new entry into a SymbolTable.  Assumes that this
  entry is not already present. */
 SymNode *InsertIntoSymbolTable(SymbolTable *symtab, char *name) {
-	printf("Going to be inserting %s\n", name);
+	//printf("Going to be inserting %s\n", name);
 	if (symtab->innerScope == NULL) {
 		printf("NULL innerscope error\n");
 		fprintf(stderr, "Error: inserting into an empty symbol table\n");
 		exit(1);
 	}
 	
-	printf("LookingupSymHashTable being called\n");
+	//printf("LookingupSymHashTable being called\n");
 	SymNode *node = LookupSymHashTable(symtab->innerScope, name, NOHASHSLOT);
 	
 	if (node == NULL)
