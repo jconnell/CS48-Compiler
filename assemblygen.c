@@ -88,7 +88,7 @@ void AssemblyGen(Quad* quads, FILE* file) {//, SymbolTable* symtab) {
 				}
 				else if (quads->addr3.kind == IntConst) {
 					fprintf(file, "LDC 1, %d(0)\n", quads->addr3->contents->val);
-					fprintf(file, "CVTIF 1, %d(1)\n", s3->attrs->memoffset);
+					fprintf(file, "CVTIF 1, 0(1)\n");
 					fprintf(file, "ADDF 0, 1, 0\n");
 				}
 				else if (quads->addr3.kind == DouConst) {
@@ -104,73 +104,68 @@ void AssemblyGen(Quad* quads, FILE* file) {//, SymbolTable* symtab) {
 			}
 		}
 		else if (quads->addr2.kind == IntConst) {
+			fprintf(file, "LDC 0, %d(0)\n", quads->addr2->contents->val);
 			if (quads->addr3.kind == String) {
 				if (s3->attrs->type == IntT) {
+					fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
+					fprintf(file, "ADD 0, 1, 0\n");
 				}
 				else if (s3->attrs->type == DouT) {
+					fprintf(file, "CVTIF 0, 0(0)\n");
+					fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
+					fprintf(file, "ADDF 0, 1, 0\n");
 				}
 				else {
+					fprintf(file, "ERROR\n");
 				}
 			}
 			else if (quads->addr3.kind == IntConst) {
+				fprintf(file, "LDC 1, %d(0)\n", quads->addr3->contents->val);
+				fprintf(file, "ADD 0, 1, 0\n");
 			}
 			else if (quads->addr3.kind == DouConst) {
+				fprintf(file, "CVTIF 0, 0(0)\n");
+				fprintf(file, "LDFC 1, %d(0)\n", quads->addr3->contents->dval);
+				fprintf(file, "ADDF 0, 1, 0\n");
 			}
 			else {
+				fprintf(file, "ERROR\n");
 			}
 		}
 		else if (quads->addr2.kind == DouConst) {
+			fprintf(file, "LDFC 0, %d(0)\n", quads->addr2->contents->dval);
 			if (quads->addr3.kind == String) {
 				if (s3->attrs->type == IntT) {
+					fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
+					fprintf(file, "CVTIF 1, 0(1)\n");
+					fprintf(file, "ADDF 0, 1, 0\n");
 				}
 				else if (s3->attrs->type == DouT) {
+					fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
+					fprintf(file, "ADDF 0, 1, 0\n");
 				}
 				else {
+					fprintf(file, "ERROR\n");
 				}
 			}
 			else if (quads->addr3.kind == IntConst) {
+				fprintf(file, "LDC 1, %d(0)\n", quads->addr3->contents->val);
+				fprintf(file, "CVTIF 1, 0(1)\n");
+				fprintf(file, "ADDF 0, 1, 0\n");
 			}
 			else if (quads->addr3.kind == DouConst) {
+				fprintf(file, "LDFC 1, %d(0)\n", quads->addr3->contents->dval);
+				fprintf(file, "ADDF 0, 1, 0\n");
 			}
 			else {
+				fprintf(file, "ERROR\n");
 			}
 		}
 		else {
+			fprintf(file, "ERROR\n");
 		}
 	
 		
-			
-				
-					
-		
-		if (quads->addr2.kind == String) { // Check Symbol Table
-			
-			if (s2->attrs->type == IntT) {
-				
-			}
-			else if (s2->attrs->type == DouT) {
-				fprintf("LD 0, %d(5)\n", s2->attrs->memoffset);
-			}
-		}
-		
-		if (quads->addr3.kind == String) { // Check Symbol Table
-			if (s3->attrs->type == IntT) {
-				
-			}
-			else if (s3->attrs->type == DouT) {
-				
-			}
-		}
-		
-		if (quads->addr1.kind == String) { // Check Symbol Table
-			if (s1->attrs->type == IntT) {
-				
-			}
-			else if (s1->attrs->type == DouT) {
-				
-			}
-		}
-			
 		switch (quads->op) {
 			case add:
 				if (quads->addr2.kind == IntConst) {
