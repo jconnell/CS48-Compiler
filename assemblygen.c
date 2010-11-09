@@ -42,8 +42,8 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 	
 	while (i <= 90) {
 		
-		char type_to_store = 'i';
-		char type_of_storage = 'i';
+		char type_to_store = 'i';		// Type of variable to be stored to (default: int)
+		char type_of_storage = 'i';		// Type of variable to be stored (default: int)
 		
 		/* TYPE DETECTION OF THE FIRST QUAD VARIABLE */
 		if (quads[i]->addr1.kind == String){
@@ -97,55 +97,55 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 /****************** TM48 COMMANDS *******************/
 /****************************************************/
 		
-		if (quads[i]->op == add) {
+		if (quads[i]->op == add) {			// Addition (+)
 			AK = math;
 			AssemCommand = "ADD";
 		}
-		else if (quads[i]->op == sub) {
+		else if (quads[i]->op == sub) {		// Subtraction (-)
 			AK = math;
 			AssemCommand = "SUB";
 		}
-		else if (quads[i]->op == mul) {
+		else if (quads[i]->op == mul) {		// Multiplication (*)
 			AK = math;
 			AssemCommand = "MUL";
 		}
-		else if (quads[i]->op == divi) {
+		else if (quads[i]->op == divi) {	// Division (/)
 			AK = math;
 			AssemCommand = "DIV";
 		}
-		else if (quads[i]->op == gt) {
+		else if (quads[i]->op == gt) {		// Greater Than (>)
 			AK = inequality;
 			AssemCommand = "GT";
 		}
-		else if (quads[i]->op == gteq) {
+		else if (quads[i]->op == gteq) {	// Greater Than or Equal (>=)
 			AK = inequality;
 			AssemCommand = "GE";
 		}
-		else if (quads[i]->op == lt) {
+		else if (quads[i]->op == lt) {		// Less Than (<)
 			AK = inequality;
 			AssemCommand = "LT";
 		}
-		else if (quads[i]->op == lteq) {
+		else if (quads[i]->op == lteq) {	// Less Than or Equal (<=)
 			AK = inequality;
 			AssemCommand = "LE";
 		}
-		else if (quads[i]->op == eq) {
+		else if (quads[i]->op == eq) {		// Equals (=)
 			AK = inequality;
 			AssemCommand = "EQ";
 		}
-		else if (quads[i]->op == neq) {
+		else if (quads[i]->op == neq) {		// Not Equal To (!=)
 			AK = inequality;
 			AssemCommand = "NE";
 		}
-		else if (quads[i]->op == asn) {
+		else if (quads[i]->op == asn) {		// Store value
 			AK = assignment;
 			AssemCommand = "ST";
 		}
-		else if (quads[i]->op == exs) {
+		else if (quads[i]->op == exs) {		// Exit Scope
 			AK = other;
 			AssemCommand = " ";
 		}
-		else if (quads[i]->op == ens) {
+		else if (quads[i]->op == ens) {		// Enter Scope
 			AK = other;
 			AssemCommand = " ";
 		}
@@ -161,16 +161,18 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		switch (AK) {
 			/*** MATH OPERATORS ***/
 			case (math):  // Arithmetic Operations
-				if (quads[i]->addr2.kind == String) {
+				if (quads[i]->addr2.kind == String) {	
 					printf("%d\n", s2->attrs->type);
-					if (s2->attrs->type == IntT) {
+					if (s2->attrs->type == IntT) {		
 						fprintf(file, "LD 0, %d(5)\n", s2->attrs->memoffset);
 						if (quads[i]->addr3.kind == String) {
 							if (s3->attrs->type == IntT) {
+								// Operation between Int var and Int var
 								fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
 								fprintf(file, "%s 0, 1, 0\n", AssemCommand);
 							}
 							else if (s3->attrs->type == DouT) {
+								// Operation between Int var and Double var
 								type_to_store = 'd';
 								fprintf(file, "CVTIF 0, 0(0)\n");
 								fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
@@ -181,10 +183,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							}
 						}
 						else if (quads[i]->addr3.kind == IntConst) {
+							// Operation between Int var and Int constant
 							fprintf(file, "LDC 1, %d(0)\n", quads[i]->addr3.contents.val);
 							fprintf(file, "%s 0, 1, 0\n", AssemCommand);
 						}
 						else if (quads[i]->addr3.kind == DouConst) {
+							// Operation between Int var and Double constant
 							type_to_store = 'd';
 							fprintf(file, "CVTIF 0, 0(0)\n");
 							fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
@@ -199,11 +203,13 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
 						if (quads[i]->addr3.kind == String) {
 							if (s3->attrs->type == IntT) {
+								// Operation between Double var and Int var
 								fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
 								fprintf(file, "CVTIF 1, 0(1)\n");
 								fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 							}
 							else if (s3->attrs->type == DouT) {
+								// Operation between Double var and Double var
 								fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 								fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 							}
@@ -212,11 +218,13 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							}
 						}
 						else if (quads[i]->addr3.kind == IntConst) {
+							// Operation between Double var and Int constant
 							fprintf(file, "LDC 1, %d(0)\n", quads[i]->addr3.contents.val);
 							fprintf(file, "CVTIF 1, 0(1)\n");
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 						}
 						else if (quads[i]->addr3.kind == DouConst) {
+							// Operation between Double var and Double constant
 							fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 						}
@@ -232,10 +240,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "LDC 0, %d(0)\n", quads[i]->addr2.contents.val);
 					if (quads[i]->addr3.kind == String) {
 						if (s3->attrs->type == IntT) {
+							// Operation between Int constant and Int var
 							fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
 							fprintf(file, "%s 0, 1, 0\n", AssemCommand);
 						}
 						else if (s3->attrs->type == DouT) {
+							// Operation between Int constant and Double var
 							type_to_store = 'd';
 							fprintf(file, "CVTIF 0, 0(0)\n");
 							fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
@@ -246,10 +256,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else if (quads[i]->addr3.kind == IntConst) {
+						// Operation between Int constant and Int constant
 						fprintf(file, "LDC 1, %d(0)\n", quads[i]->addr3.contents.val);
 						fprintf(file, "%s 0, 1, 0\n", AssemCommand);
 					}
 					else if (quads[i]->addr3.kind == DouConst) {
+						// Operation between Int constant and Double constant
 						type_to_store = 'd';
 						fprintf(file, "CVTIF 0, 0(0)\n");
 						fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
@@ -264,11 +276,13 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr2.contents.dval);
 					if (quads[i]->addr3.kind == String) {
 						if (s3->attrs->type == IntT) {
+							// Operation between Double constant and Int var
 							fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
 							fprintf(file, "CVTIF 1, 0(1)\n");
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 						}
 						else if (s3->attrs->type == DouT) {
+							// Operation between Double constant and Double var
 							fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 						}
@@ -277,11 +291,13 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else if (quads[i]->addr3.kind == IntConst) {
+						// Operation between Double constant and Int constant
 						fprintf(file, "LDC 1, %d(0)\n", quads[i]->addr3.contents.val);
 						fprintf(file, "CVTIF 1, 0(1)\n");
 						fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 					}
 					else if (quads[i]->addr3.kind == DouConst) {
+						// Operation between Double constant and Double constant
 						fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 						fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
 					}
@@ -293,18 +309,18 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "ERROR\n");
 				}
 				
-				if (type_to_store == 'd' && type_of_storage == 'd') {
+				if (type_to_store == 'd' && type_of_storage == 'd') {		// Store double in double
 					fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
 				}
-				else if (type_to_store == 'd' && type_of_storage == 'i') {
+				else if (type_to_store == 'd' && type_of_storage == 'i') {	// Store double in int
 					fprintf(file, "CVTFI 0, 0(0)\n");
 					fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
 				}
-				else if (type_to_store == 'i' && type_of_storage == 'd') {
+				else if (type_to_store == 'i' && type_of_storage == 'd') {	// Store int in double
 					fprintf(file, "CVTIF 0, 0(0)\n");
 					fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
 				}
-				else if (type_to_store == 'i' && type_of_storage == 'i') {
+				else if (type_to_store == 'i' && type_of_storage == 'i') {	// Store int in int
 					fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
 				}
 				else {
@@ -320,6 +336,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						fprintf(file, "LD 0, %d(5)\n", s2->attrs->memoffset);
 						if (quads[i]->addr3.kind == String) {
 							if (s3->attrs->type == IntT) {
+								// Ineqality between Int var and Int var
 								fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
 								fprintf(file, "SUB 0, 1, 0\n");
 								fprintf(file, "J%s 0, 2(7)\n", AssemCommand);
@@ -328,6 +345,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 								fprintf(file, "LDC 0, 1(0)\n");
 							}
 							else if (s3->attrs->type == DouT) {
+								// Ineqality between Int var and Double var
 								fprintf(file, "CVTIF 0, 0(0)\n");
 								fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 								fprintf(file, "SUBF 0, 1, 0\n");
@@ -341,6 +359,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							}
 						}
 						else if (quads[i]->addr3.kind == IntConst) {
+							// Ineqality between Int var and Int constant
 							fprintf(file, "LDC 1, %d(0)\n", quads[i]->addr3.contents.val);
 							fprintf(file, "SUB 0, 1, 0\n");
 							fprintf(file, "J%s 0, 2(7)\n", AssemCommand);
@@ -349,6 +368,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							fprintf(file, "LDC 0, 1(0)\n");
 						}
 						else if (quads[i]->addr3.kind == DouConst) {
+							// Ineqality between Int var and Double constant
 							fprintf(file, "CVTIF 0, 0(0)\n");
 							fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 							fprintf(file, "SUBF 0, 1, 0\n");
@@ -365,10 +385,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
 						if (quads[i]->addr3.kind == String) {
 							if (s3->attrs->type == IntT) {
+								// Ineqality between Double var and Int var
 								fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
 								fprintf(file, "CVTIF 1, 0(1)\n");
 							}
 							else if (s3->attrs->type == DouT) {
+								// Ineqality between Double var and Double var
 								fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 							}
 							else {
@@ -376,10 +398,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							}
 						}
 						else if (quads[i]->addr3.kind == IntConst) {
+							// Ineqality between Double var and Int constant
 							fprintf(file, "LDC 1, %d(0)\n", quads[i]->addr3.contents.val);
 							fprintf(file, "CVTIF 1, 0(1)\n");
 						}
 						else if (quads[i]->addr3.kind == DouConst) {
+							// Ineqality between Double var and Double constant
 							fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 						}
 						else {
@@ -399,6 +423,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "LDC 0, %d(0)\n", quads[i]->addr2.contents.val);
 					if (quads[i]->addr3.kind == String) {
 						if (s3->attrs->type == IntT) {
+							// Ineqality between Int constant and Int var
 							fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
 							fprintf(file, "SUB 0, 1, 0\n");
 							fprintf(file, "J%s 0, 2(7)\n", AssemCommand);
@@ -407,6 +432,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							fprintf(file, "LDC 0, 1(0)\n");
 						}
 						else if (s3->attrs->type == DouT) {
+							// Ineqality between Int constant and Double var
 							fprintf(file, "CVTIF 0, 0(0)\n");
 							fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 							fprintf(file, "SUBF 0, 1, 0\n");
@@ -420,6 +446,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else if (quads[i]->addr3.kind == IntConst) {
+						// Ineqality between Int constant and Int constant
 						fprintf(file, "LDC 1, %d(0)\n", quads[i]->addr3.contents.val);
 						fprintf(file, "SUB 0, 1, 0\n");
 						fprintf(file, "J%s 0, 2(7)\n", AssemCommand);
@@ -428,6 +455,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						fprintf(file, "LDC 0, 1(0)\n");
 					}
 					else if (quads[i]->addr3.kind == DouConst) {
+						// Ineqality between Int constant and Double constant
 						fprintf(file, "CVTIF 0, 0(0)\n");
 						fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 						fprintf(file, "SUBF 0, 1, 0\n");
@@ -444,10 +472,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr2.contents.dval);
 					if (quads[i]->addr3.kind == String) {
 						if (s3->attrs->type == IntT) {
+							// Ineqality between Double constant and Int var
 							fprintf(file, "LD 1, %d(5)\n", s3->attrs->memoffset);
 							fprintf(file, "CVTIF 1, 0(1)\n");
 						}
 						else if (s3->attrs->type == DouT) {
+							// Ineqality between Double constant and Double var
 							fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 						}
 						else {
@@ -455,10 +485,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else if (quads[i]->addr3.kind == IntConst) {
+						// Ineqality between Double constant and Int constant
 						fprintf(file, "LDC 1, %d(0)\n", quads[i]->addr3.contents.val);
 						fprintf(file, "CVTIF 1, 0(1)\n");
 					}
 					else if (quads[i]->addr3.kind == DouConst) {
+						// Ineqality between Double constant and Double constant
 						fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 					}
 					else {
@@ -474,15 +506,18 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "ERROR\n");
 				}
 				break;
+			/*** ASSIGNMENT ***/
 			case assignment:
 				if (type_of_storage == 'd') {
 					if (quads[i]->addr2.kind == String) {
 						if (s2->attrs->type == IntT) {
+							// Store an Int variable in a Double variable
 							fprintf(file, "LD 0, %d(5)\n", s2->attrs->memoffset);
 							fprintf(file, "CVTIF 0, 0(0)\n");
 							fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
 						}
 						else if (s2->attrs->type == DouT) {
+							// Store a Double variable in a Double variable
 							fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
 							fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
 						}
@@ -491,10 +526,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else if (quads[i]->addr2.kind == DouConst) {
+						// Store a Double constant in a Double variable
 						fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr2.contents.dval);
 						fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
 					}
 					else if (quads[i]->addr2.kind == IntConst) {
+						// Store an Int constant in a Double variable
 						fprintf(file, "LDC 0, %d(0)\n", quads[i]->addr2.contents.val);
 						fprintf(file, "CVTIF 0 0(0)\n");
 						fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
@@ -506,10 +543,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				else { // If storage type is an integer
 					if (quads[i]->addr2.kind == String) {
 						if (s2->attrs->type == IntT) {
+							// Store an Int variable in an Int variable
 							fprintf(file, "LD 0, %d(5)\n", s2->attrs->memoffset);
 							fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
 						}
 						else if (s2->attrs->type == DouT) {
+							// Store a Double variable in an Int variable
 							fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
 							fprintf(file, "CVTFI 0, 0(0)\n");
 							fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
@@ -519,11 +558,13 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else if (quads[i]->addr2.kind == DouConst) {
+						// Store a Double constant in an Int variable
 						fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr2.contents.dval);
 						fprintf(file, "CVTFI 0 0(0)\n");
 						fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
 					}
 					else if (quads[i]->addr2.kind == IntConst) {
+						// Store an Int constant in an Int variable
 						fprintf(file, "LDC 0, %d(0)\n", quads[i]->addr2.contents.val);
 						fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
 					}
