@@ -137,6 +137,10 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 			AK = inequality;
 			AssemCommand = "NE";
 		}
+		else if (quads[i]->op == asn) {
+			AK = assignment;
+			AssemCommand = "ST";
+		}
 		else if (quads[i]->op == exs) {
 			AK = other;
 			AssemCommand = " ";
@@ -290,18 +294,18 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				}
 				
 				if (type_to_store == 'd' && type_of_storage == 'd') {
-					fprintf(file, "STF 0, %d(0)\n", s1->attrs->memoffset);
+					fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
 				}
 				else if (type_to_store == 'd' && type_of_storage == 'i') {
 					fprintf(file, "CVTFI 0, 0(0)\n");
-					fprintf(file, "ST 0, %d(0)\n", s1->attrs->memoffset);
+					fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
 				}
 				else if (type_to_store == 'i' && type_of_storage == 'd') {
 					fprintf(file, "CVTIF 0, 0(0)\n");
-					fprintf(file, "STF 0, %d(0)\n", s1->attrs->memoffset);
+					fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
 				}
 				else if (type_to_store == 'i' && type_of_storage == 'i') {
-					fprintf(file, "ST 0, %d(0)\n", s1->attrs->memoffset);
+					fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
 				}
 				else {
 					fprintf(file, "ERROR\n");
@@ -470,6 +474,65 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "ERROR\n");
 				}
 				break;
+			case assignment:
+				if (type_of_storage == 'd') {
+					if (quads[i]->addr2.kind == String) {
+						if (s2->attrs->type == IntT) {
+							fprintf(file, "LD 0, %d(5)\n", s2->attrs->memoffset);
+							fprintf(file, "CVTIF 0, 0(0)\n");
+							fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
+						}
+						else if (s2->attrs->type == DouT) {
+							fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
+							fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
+						}
+						else {
+							fprintf(file, "ERROR\n");
+						}
+					}
+					else if (quads[i]->addr2.kind == DouConst) {
+						fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr2.contents.dval);
+						fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
+					}
+					else if (quads[i]->addr2.kind == IntConst) {
+						fprintf(file, "LDC 0, %d(0)\n", quads[i]->addr2.contents.val);
+						fprintf(file, "CVTIF 0 0(0)\n");
+						fprintf(file, "STF 0, %d(5)\n", s1->attrs->memoffset);
+					}
+					else {
+						fprintf(file, "ERROR\n");
+					}
+				}
+				else { // If storage type is an integer
+					if (quads[i]->addr2.kind == String) {
+						if (s2->attrs->type == IntT) {
+							fprintf(file, "LD 0, %d(5)\n", s2->attrs->memoffset);
+							fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
+						}
+						else if (s2->attrs->type == DouT) {
+							fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
+							fprintf(file, "CVTFI 0, 0(0)\n");
+							fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
+						}
+						else {
+							fprintf(file, "ERROR\n");
+						}
+					}
+					else if (quads[i]->addr2.kind == DouConst) {
+						fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr2.contents.dval);
+						fprintf(file, "CVTFI 0 0(0)\n");
+						fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
+					}
+					else if (quads[i]->addr2.kind == IntConst) {
+						fprintf(file, "LDC 0, %d(0)\n", quads[i]->addr2.contents.val);
+						fprintf(file, "ST 0, %d(5)\n", s1->attrs->memoffset);
+					}
+					else {
+						fprintf(file, "ERROR\n");
+					}
+				}
+				break;
+				
 			case enterScope:
 				//printf(" Level %d \n", GetNodeLevel(s1));
 				//printf("ENTERING SCOPE\n");
