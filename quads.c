@@ -25,7 +25,7 @@ Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
 char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
-	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs"}; 
+	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs", "loadpar"}; 
 
 //Get the wider of the two - int or double
 int MaxType(Address a, Address b)
@@ -70,12 +70,16 @@ int CG(ast_node n)
 {
 	printf("Called CG\n");
 	
+	//temporaries we're going to use throughout the CG function, just for
+	//convenience
 	Address ar1, ar2, ar3, ar4, ar5, tqa, ta, topatch, e, nq;
 	int lrp, rrp;
 	int tq, t, testq, gq;
 	int typer;
 	SymNode *sn;
 	value v;
+	
+	ast_node next;
 	
 	ast_node x;
 	
@@ -89,6 +93,7 @@ int CG(ast_node n)
 	switch (n->node_type) {
 			
 			//we have a function with parameters
+		//Based on Louden p 442
 		case FUNC_DEF:
 			printf("In FUNC_DEF Case\n");
 			//add the function name to the symbol table
@@ -109,7 +114,7 @@ int CG(ast_node n)
 			v.ival = lrp;
 			SetValueAttr(sn, v);
 			//we're going to ignore the parameters as per louden p 441
-			ast_node next = n->left_child->right_sibling;
+			next = n->left_child->right_sibling;
 			while (next->node_type == FUNC_PARAM) 
 			{
 				next=next->right_sibling;
@@ -119,6 +124,44 @@ int CG(ast_node n)
 			//finish it off with a ret
 			GenQuad(ret, e, e, e);
 			
+			break;
+		
+		//has id and parameters - we jump to the quad of the id
+		//Based on Louden p 442
+		case FUNC_CALL:
+			printf("FUNC_CALL in Switch of CG\n");
+			e.kind = Empty;
+			
+			//load all the params
+			next = n->left_child;
+			while (next->node_type == FUNC_PARAM) 
+			{
+				//we're telling the assembler we want it to load parameters for a function call
+				lrp = CG(next);
+				GenQuad(loadpar, quads[lrp]->addr1, e, e);
+				next=next->right_sibling;
+			}
+			
+			//the id has in the symbol table a value associated with it
+			//which represents the quad we want to jump to
+			lrp = CG(next);
+			
+			//get the name of the ID and look up its place
+			sn = LookupInSymbolTable(symtab, quads[lrp]->addr1.contents.name);
+			v = GetValueAttr(sn);
+			
+			t = v.ival;
+			
+			ar1.kind = IntConst;
+			ar1.contents.val = t; 
+			
+			GenQuad(gotoq, ar1, e, e);
+			//jump to the location of the id
+			
+			break;
+			
+		case FUNC_PARAM:
+			return CG(n->left_child);
 			break;
 		
 		case RETURN_S:
@@ -1011,6 +1054,8 @@ char *NewTemp(int siz)
 	
 	//printf("Inserting into Symbol Table\n");
 	SymNode *thesn = InsertIntoSymbolTable(symtab, tempName);
+	
+	printf("%d the scope of %s\n", GetNodeLevel(thesn), tempName);
 	
 	if (thesn->level == 1) {
 		SetOffsetAttr(thesn, goffset-siz);
