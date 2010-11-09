@@ -141,6 +141,14 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 			AK = assignment;
 			AssemCommand = "ST";
 		}
+		else if (quads[i]->op == rd) {		// Read from STD IN
+			AK = read;
+			AssemCommand = "IN";
+		}
+		else if (quads[i]->op == wri) {		// Write to STD OUT
+			AK = write;
+			AssemCommand = "OUT";
+		}
 		else if (quads[i]->op == exs) {		// Exit Scope
 			AK = other;
 			AssemCommand = " ";
@@ -159,6 +167,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		
 		printf("%d %s %d \n", AK, AssemCommand, quads[i]->op);
 		switch (AK) {
+				
 			/*** MATH OPERATORS ***/
 			case (math):  // Arithmetic Operations
 				if (quads[i]->addr2.kind == String) {	
@@ -326,9 +335,9 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				else {
 					fprintf(file, "ERROR\n");
 				} 
-							
-							
 				break;
+				
+
 			/*** INEQUALITIES ***/
 			case inequality:
 				if (quads[i]->addr2.kind == String) {
@@ -506,6 +515,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "ERROR\n");
 				}
 				break;
+				
 			/*** ASSIGNMENT ***/
 			case assignment:
 				if (type_of_storage == 'd') {
@@ -573,7 +583,50 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					}
 				}
 				break;
-				
+			
+			/*** READ FROM STANDARD INPUT ***/
+			case read:
+				if (s1->attrs->type == IntT) {
+					fprintf(file, "IN 0, 0, 0\n");
+				}
+				else if (s1->attrs->type == DouT) {
+					fprintf(file, "INF 0, 0, 0\n");
+				}
+				else {
+					fprintf(file, "ERROR\n");
+				}
+				break;
+			
+			/*** WRITE TO STANDARD OUTPUT ***/
+			case write:
+				if (quads[i]->addr1.kind == String) {
+					if (s1->attrs->type == IntT) {
+						fprintf(file, "LD 0, %d(5)\n", s1->attrs->memoffset);
+						fprintf(file, "OUT 0, 0, 0\n");
+					}
+					else if (s1->attrs->type == DouT) {
+						fprintf(file, "LDF 0, %d(5)\n", s1->attrs->memoffset);
+						fprintf(file, "OUTF 0, 0, 0\n");
+					}
+					else {
+						fprintf(file, "ERROR\n");
+					}
+				}
+				else if (quads[i]->addr1.kind == IntConst) {
+					fprintf(file, "LDC 0, %d(0)\n", quads[i]->addr1.contents.val);
+					fprintf(file, "OUT 0, 0, 0\n");
+				}
+				else if (quads[i]->addr1.kind == DouConst) {
+					fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr1.contents.dval);
+					fprintf(file, "OUTF 0, 0, 0\n");
+				}
+				else {
+					fprintf(file, "ERROR\n");
+				}
+				break;
+			
+								
+								
 			case enterScope:
 				//printf(" Level %d \n", GetNodeLevel(s1));
 				//printf("ENTERING SCOPE\n");
