@@ -25,7 +25,7 @@ Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
 char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
-	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs", "loadpar"}; 
+	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs", "loadpar", "jne"}; 
 
 //Get the wider of the two - int or double
 int MaxType(Address a, Address b)
@@ -91,6 +91,45 @@ int CG(ast_node n)
 	}
 	
 	switch (n->node_type) {
+			
+			
+		case SWITCH_ST:
+			//this is the id or int we compare against
+			lrp = CG(n->left_child);
+			ar1 = quads[lrp]->addr1;
+			
+			e.kind = Empty;
+			
+			//traverse the cases
+			next = n->left_child->right_sibling;
+			while (next->node_type == SWITCH_CASE) 
+			{
+				//get the case
+				rrp = CG(next->left_child);
+				ar2 = quads[rrp]->addr1;
+				
+				//if the values are not equal, skip this case
+				gq = GenQuad(jne, e, ar2, ar1);
+				
+				//process the sequence
+				CG(next->left_child->right_sibling);
+				
+				nq.kind = IntConst;
+				nq.contents.val = NextQuad();
+				PatchQuad(gq, 1, nq);
+				
+				next=next->right_sibling;
+			}
+							
+			//last node should be the default
+			
+			CG(next);
+			
+			break;
+			
+		case SWITCH_CASE:
+			
+			break;
 			
 			//we have a function with parameters
 		//Based on Louden p 442

@@ -1,0 +1,62 @@
+DOWN
+NODE SEQ
+	DOWN
+	NODE INT
+		DOWN
+		NODE ID a
+		UP
+	NODE INT
+		DOWN
+		NODE ID b
+		UP
+	NODE SWITCH
+		DOWN
+		NODE ID a
+		NODE CASE
+			DOWN
+			NODE INTLIT 10
+			NODE SEQ
+				DOWN
+				NODE *
+					DOWN
+					NODE DOUBLELIT 10
+					NODE INTLIT 7
+					UP
+				NODE +
+					DOWN
+					NODE DOUBLELIT 10
+					NODE INTLIT 8
+					UP
+				UP
+			UP
+		NODE CASE
+			DOWN
+			NODE INTLIT 25
+			NODE SEQ
+				DOWN
+				NODE /
+					DOWN
+					NODE DOUBLELIT 10
+					NODE INTLIT 12
+					UP
+				NODE -
+					DOWN
+					NODE DOUBLELIT 10
+					NODE INTLIT 13
+					UP
+				UP
+			UP
+		NODE SEQ
+			DOWN
+			NODE <
+				DOWN
+				NODE READ
+					DOWN
+					NODE ID b
+					UP
+				NODE INTLIT 89
+				UP
+			UP
+		UP
+	UP
+UP
