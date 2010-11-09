@@ -40,18 +40,24 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 	SymNode *s2;
 	SymNode *s3;
 	
-	while (i <= 20) {
+	while (i <= 90) {
+		
+		char type_to_store = 'i';
+		char type_of_storage = 'i';
 		
 		/* TYPE DETECTION OF THE FIRST QUAD VARIABLE */
 		if (quads[i]->addr1.kind == String){
 			s1 = LookupInSymbolTable(symtab, quads[i]->addr1.contents.name);
 			printf(" %s", quads[i]->addr1.contents.name);
+			if (s1->attrs->type == DouT)
+				type_of_storage = 'd';
 		}
 		else if (quads[i]->addr1.kind == IntConst) {
 			printf(" %d", quads[i]->addr1.contents.val);
 		}
 		else if (quads[i]->addr1.kind == DouConst) {
 			printf(" %f", quads[i]->addr1.contents.dval);
+			type_of_storage = 'd';
 		}
 		else printf(" - ");
 		
@@ -84,6 +90,8 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		
 		AssemKind AK;
 		char* AssemCommand = " ";
+		
+		
 		
 /****************************************************/
 /****************** TM48 COMMANDS *******************/
@@ -123,7 +131,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		}
 		else if (quads[i]->op == eq) {
 			AK = inequality;
-			AssemCommand = "E";
+			AssemCommand = "EQ";
 		}
 		else if (quads[i]->op == neq) {
 			AK = inequality;
@@ -147,6 +155,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		
 		printf("%d %s %d \n", AK, AssemCommand, quads[i]->op);
 		switch (AK) {
+			/*** MATH OPERATORS ***/
 			case (math):  // Arithmetic Operations
 				if (quads[i]->addr2.kind == String) {
 					printf("%d\n", s2->attrs->type);
@@ -158,6 +167,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 								fprintf(file, "%s 0, 1, 0\n", AssemCommand);
 							}
 							else if (s3->attrs->type == DouT) {
+								type_to_store = 'd';
 								fprintf(file, "CVTIF 0, 0(0)\n");
 								fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 								fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
@@ -171,6 +181,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							fprintf(file, "%s 0, 1, 0\n", AssemCommand);
 						}
 						else if (quads[i]->addr3.kind == DouConst) {
+							type_to_store = 'd';
 							fprintf(file, "CVTIF 0, 0(0)\n");
 							fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
@@ -180,7 +191,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else if (s2->attrs->type == DouT) {
-						printf("I'm here.\n");
+						type_to_store = 'd';
 						fprintf(file, "LDF 0, %d(5)\n", s2->attrs->memoffset);
 						if (quads[i]->addr3.kind == String) {
 							if (s3->attrs->type == IntT) {
@@ -210,7 +221,6 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 					}
 					else {
-						printf("I'm here.\n");
 						fprintf(file, "ERROR\n");
 					}
 				}
@@ -222,6 +232,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							fprintf(file, "%s 0, 1, 0\n", AssemCommand);
 						}
 						else if (s3->attrs->type == DouT) {
+							type_to_store = 'd';
 							fprintf(file, "CVTIF 0, 0(0)\n");
 							fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 							fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
@@ -235,6 +246,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						fprintf(file, "%s 0, 1, 0\n", AssemCommand);
 					}
 					else if (quads[i]->addr3.kind == DouConst) {
+						type_to_store = 'd';
 						fprintf(file, "CVTIF 0, 0(0)\n");
 						fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 						fprintf(file, "%sF 0, 1, 0\n", AssemCommand);
@@ -244,6 +256,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					}
 				}
 				else if (quads[i]->addr2.kind == DouConst) {
+					type_to_store = 'd';
 					fprintf(file, "LDFC 0, %f(0)\n", quads[i]->addr2.contents.dval);
 					if (quads[i]->addr3.kind == String) {
 						if (s3->attrs->type == IntT) {
@@ -275,7 +288,28 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				else {
 					fprintf(file, "ERROR\n");
 				}
+				
+				if (type_to_store == 'd' && type_of_storage == 'd') {
+					fprintf(file, "STF 0, %d(0)\n", s1->attrs->memoffset);
+				}
+				else if (type_to_store == 'd' && type_of_storage == 'i') {
+					fprintf(file, "CVTFI 0, 0(0)\n");
+					fprintf(file, "ST 0, %d(0)\n", s1->attrs->memoffset);
+				}
+				else if (type_to_store == 'i' && type_of_storage == 'd') {
+					fprintf(file, "CVTIF 0, 0(0)\n");
+					fprintf(file, "STF 0, %d(0)\n", s1->attrs->memoffset);
+				}
+				else if (type_to_store == 'i' && type_of_storage == 'i') {
+					fprintf(file, "ST 0, %d(0)\n", s1->attrs->memoffset);
+				}
+				else {
+					fprintf(file, "ERROR\n");
+				} 
+							
+							
 				break;
+			/*** INEQUALITIES ***/
 			case inequality:
 				if (quads[i]->addr2.kind == String) {
 					if (s2->attrs->type == IntT) {
@@ -294,9 +328,9 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 								fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 								fprintf(file, "SUBF 0, 1, 0\n");
 								fprintf(file, "JF%s 0, 2(7)\n", AssemCommand);
-								fprintf(file, "LDFC 0, 0(0)\n");
+								fprintf(file, "LDC 0, 0(0)\n");
 								fprintf(file, "LDA 7, 1(7)\n");
-								fprintf(file, "LDFC 0, 1(0)\n");
+								fprintf(file, "LDC 0, 1(0)\n");
 							}
 							else {
 								fprintf(file, "ERROR\n");
@@ -315,9 +349,9 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 							fprintf(file, "SUBF 0, 1, 0\n");
 							fprintf(file, "JF%s 0, 2(7)\n", AssemCommand);
-							fprintf(file, "LDFC 0, 0(0)\n");
+							fprintf(file, "LDC 0, 0(0)\n");
 							fprintf(file, "LDA 7, 1(7)\n");
-							fprintf(file, "LDFC 0, 1(0)\n");
+							fprintf(file, "LDC 0, 1(0)\n");
 						}
 						else {
 							fprintf(file, "ERROR\n");
@@ -349,9 +383,9 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						}
 						fprintf(file, "SUBF 0, 1, 0\n");
 						fprintf(file, "JF%s 0, 2(7)\n", AssemCommand);
-						fprintf(file, "LDFC 0, 0(0)\n");
+						fprintf(file, "LDC 0, 0(0)\n");
 						fprintf(file, "LDA 7, 1(7)\n");
-						fprintf(file, "LDFC 0, 1(0)\n");
+						fprintf(file, "LDC 0, 1(0)\n");
 					}
 					else {
 						fprintf(file, "ERROR\n");
@@ -373,9 +407,9 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 							fprintf(file, "LDF 1, %d(5)\n", s3->attrs->memoffset);
 							fprintf(file, "SUBF 0, 1, 0\n");
 							fprintf(file, "JF%s 0, 2(7)\n", AssemCommand);
-							fprintf(file, "LDFC 0, 0(0)\n");
+							fprintf(file, "LDC 0, 0(0)\n");
 							fprintf(file, "LDA 7, 1(7)\n");
-							fprintf(file, "LDFC 0, 1(0)\n");
+							fprintf(file, "LDC 0, 1(0)\n");
 						}
 						else {
 							fprintf(file, "ERROR\n");
@@ -394,9 +428,9 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 						fprintf(file, "LDFC 1, %f(0)\n", quads[i]->addr3.contents.dval);
 						fprintf(file, "SUBF 0, 1, 0\n");
 						fprintf(file, "JF%s 0, 2(7)\n", AssemCommand);
-						fprintf(file, "LDFC 0, 0(0)\n");
+						fprintf(file, "LDC 0, 0(0)\n");
 						fprintf(file, "LDA 7, 1(7)\n");
-						fprintf(file, "LDFC 0, 1(0)\n");
+						fprintf(file, "LDC 0, 1(0)\n");
 					}
 					else {
 						fprintf(file, "ERROR\n");
@@ -428,9 +462,9 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					}
 					fprintf(file, "SUBF 0, 1, 0\n");
 					fprintf(file, "JF%s 0, 2(7)\n", AssemCommand);
-					fprintf(file, "LDFC 0, 0(0)\n");
+					fprintf(file, "LDC 0, 0(0)\n");
 					fprintf(file, "LDA 7, 1(7)\n");
-					fprintf(file, "LDFC 0, 1(0)\n");
+					fprintf(file, "LDC 0, 1(0)\n");
 				}
 				else {
 					fprintf(file, "ERROR\n");
