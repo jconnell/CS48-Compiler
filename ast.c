@@ -135,6 +135,7 @@ static struct token_lookup token_table[] = {
 	{ "FUNCTIONCALL", FUNC_CALL},
 	{ "CONST", CONSTANT},
 	{ "SWITCH", SWITCH_ST},
+	{ "CASE", SWITCH_CASE},
 	{ "BREAK", BREAK_ST},
 	{ "CONTINUE", CONTINUE_ST},
 	{ "SIZEOF", OP_SIZEOF},
