@@ -731,7 +731,7 @@ int CG(ast_node n)
 		case SEQ:
 			//adapted from THC if code
 			e.kind = Empty;
-			EnterScope(symtab);
+			//EnterScope(symtab);
 			//we must tell the assembly generator we've entered a new scope
 			GenQuad(ens, e, e, e);
 			x = n->left_child;
@@ -741,7 +741,7 @@ int CG(ast_node n)
 			}
 			GenQuad(exs, e, e, e);
 			//we must tell the assembly generator we've exited a scope
-			LeaveScope(symtab);
+			//LeaveScope(symtab);
 			break;
 			
 			
@@ -1397,11 +1397,10 @@ int main(int argc, char **argv)
 	//char a2[5];
 	//char a3[5];
 	
-	
-	
-	//SEGFAULT HAPPENING IN FOLLOWING CODE
-	
 	printf("Entering Debug Printing While Loop - we have %d quads and they are:\n", currentQuad);
+	
+	FILE *qfile;
+	qfile = fopen("quadsout.txt","w");
 	
 	while(quads[i] != NULL)
 	{
@@ -1473,9 +1472,12 @@ int main(int argc, char **argv)
 		//printf("%s",a2);
 		//printf("%s",a3);
 		printf("(%s,%s,%s,%s)\n",namesOfOps[quads[i]->op],a1,a2,a3);
+		fprintf(qfile, "(%s,%s,%s,%s)\n",namesOfOps[quads[i]->op],a1,a2,a3);
 		i++;
 	}
+	fclose(qfile);
 	
+	/*
 	EnterScope(symtab);
 	EnterScope(symtab);
 	char *c = malloc(sizeof(char) *5);
@@ -1483,13 +1485,13 @@ int main(int argc, char **argv)
 	printf("before segfault?\n");
 	SymNode *sn = LookupInSymbolTable(symtab, c);
 	printf("%d the offset of a is\n", GetOffsetAttr(sn));
-	
+	*/
 	
 	if(DOASSEMBLY)
 	{
 		//File for final assembly output
 		FILE *file;
-		file = fopen("tm48code.txt","a+");
+		file = fopen("tm48code.txt","w");
 		
 		//Send over to the assembly generator, the quads array and symbol table
 		AssemblyGen(quads, file, symtab);
