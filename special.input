@@ -1,0 +1,109 @@
+DOWN
+NODE SEQ
+	DOWN
+	NODE DOWHILELOOP
+		DOWN
+		NODE ==
+			DOWN
+			NODE INTLIT 6
+			NODE INTLIT 14
+			UP
+		NODE SEQ
+			DOWN
+			NODE *
+				DOWN
+				NODE DOUBLELIT 10
+				NODE INTLIT 7
+				UP
+			NODE +
+				DOWN
+				NODE DOUBLELIT 10
+				NODE INTLIT 8
+				UP
+			UP
+		UP
+	NODE ||
+		DOWN
+		NODE INTLIT 9
+		NODE INTLIT 14
+		UP
+	NODE ==
+		DOWN
+		NODE *
+			DOWN
+			NODE DOUBLELIT 10
+			NODE INTLIT 45
+			UP
+		NODE +
+			DOWN
+			NODE DOUBLELIT 10
+			NODE INTLIT 11
+			UP
+		UP
+	NODE IFELSE
+		DOWN
+		NODE >=
+			DOWN
+			NODE INTLIT 20
+			NODE INTLIT 71
+			UP
+		NODE SEQ
+			DOWN
+			NODE DOUBLELIT 10
+			NODE INTLIT 13
+			UP
+		NODE SEQ
+			DOWN
+			NODE DOUBLELIT 10
+			NODE INTLIT 13
+			UP
+		UP
+	NODE IF
+		DOWN
+		NODE ==
+			DOWN
+			NODE INTLIT 20
+			NODE INTLIT 71
+			UP
+		NODE SEQ
+			DOWN
+			NODE INT
+				DOWN
+				NODE ID a
+				UP
+			NODE POST++
+				DOWN
+				NODE ID a
+				UP
+			NODE PRE++
+				DOWN
+				NODE ID a
+				UP
+			NODE POST--
+				DOWN
+				NODE ID a
+				UP
+			NODE PRE--
+				DOWN
+				NODE ID a
+				UP
+			NODE SIZEOF
+				DOWN
+				NODE ID a
+				UP
+			NODE =
+				DOWN
+				NODE ID a
+				NODE NEG
+					DOWN
+					NODE ID a
+					UP
+				UP
+			NODE WRITE
+				DOWN
+				NODE ID a
+				UP
+			UP
+		UP
+	UP
+UP
