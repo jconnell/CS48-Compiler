@@ -30,14 +30,14 @@ char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "ad
 //Get the wider of the two - int or double
 int MaxType(Address a, Address b)
 {
-	printf("Called MaxType\n");
+	//printf("Called MaxType\n");
 	SymNode *an;
 	SymNode *bn;
 	if (a.kind == String) 
 	{
-		printf("a.kind is string\n");
+		//printf("a.kind is string\n");
 		an = LookupInSymbolTable(symtab, a.contents.name);
-		printf("looked up a\n");
+		//printf("looked up a\n");
 		typeenum te = GetTypeAttr(an);
 		if (te == DouT)
 			return 8;
@@ -45,7 +45,7 @@ int MaxType(Address a, Address b)
 	
 	if (b.kind == String) 
 	{
-		printf("b.kind is string\n");
+		//printf("b.kind is string\n");
 		bn = LookupInSymbolTable(symtab, b.contents.name);
 		typeenum te = GetTypeAttr(bn);
 		if (te == DouT)
@@ -59,7 +59,7 @@ int MaxType(Address a, Address b)
 	}
 	
 	
-	printf("Finished MaxType\n");
+	//printf("Finished MaxType\n");
 	
 	return 4;
 }
@@ -68,7 +68,7 @@ int MaxType(Address a, Address b)
 //We will return the quad that was the last result or -1 if we have no result
 int CG(ast_node n)
 {
-	printf("Called CG\n");
+	//printf("Called CG\n");
 	
 	//temporaries we're going to use throughout the CG function, just for
 	//convenience
@@ -85,7 +85,7 @@ int CG(ast_node n)
 	
 	if (n == NULL)
 	{
-		printf("Error CG called on NULL node\n");
+		//printf("Error CG called on NULL node\n");
 		
 		return -1;
 	}
@@ -167,7 +167,7 @@ int CG(ast_node n)
 			break;
 			
 		case ARRAY_PULL:
-			printf("ARRAY_PULL Case in CG\n");
+			//printf("ARRAY_PULL Case in CG\n");
 			
 			e.kind = Empty;
 			
@@ -236,7 +236,7 @@ int CG(ast_node n)
 			break;
 			
 		case INT_ARRAY_DEC:
-			printf("INT_ARRAY_DEC Case in CG\n");
+			//printf("INT_ARRAY_DEC Case in CG\n");
 			
 			//first we get the id, the name
 			lrp = CG(n->left_child);
@@ -266,14 +266,14 @@ int CG(ast_node n)
 			e.kind = Empty;
 			
 			//going to insert into symbol table
-			printf("inserting int int array id into sym table \n");
-			printf("%s is the symbol going in\n", ar1.contents.name);
+			//printf("inserting int int array id into sym table \n");
+			//printf("%s is the symbol going in\n", ar1.contents.name);
 			sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
-			printf("Setting type attribute for that\n");
+			//printf("Setting type attribute for that\n");
 			SetTypeAttr(sn, IArT);
-			printf("Set type successfully\n");
+			//printf("Set type successfully\n");
 			SetSizeAttr(sn, t);
-			printf("Set size successfully\n");
+			//printf("Set size successfully\n");
 			
 			if (sn->level == 1) 
 			{
@@ -289,7 +289,7 @@ int CG(ast_node n)
 			break;
 			
 		case DOU_ARRAY_DEC:
-			printf("DOU_ARRAY_DEC Case in CG\n");
+			//printf("DOU_ARRAY_DEC Case in CG\n");
 			
 			//first we get the id, the name
 			lrp = CG(n->left_child);
@@ -319,14 +319,14 @@ int CG(ast_node n)
 			e.kind = Empty;
 			
 			//going to insert into symbol table
-			printf("inserting int int array id into sym table \n");
-			printf("%s is the symbol going in\n", ar1.contents.name);
+			//printf("inserting int int array id into sym table \n");
+			//printf("%s is the symbol going in\n", ar1.contents.name);
 			sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
-			printf("Setting type attribute for that\n");
+			//printf("Setting type attribute for that\n");
 			SetTypeAttr(sn, DArT);
-			printf("Set type successfully\n");
+			//printf("Set type successfully\n");
 			SetSizeAttr(sn, t);
-			printf("Set size successfully\n");
+			//printf("Set size successfully\n");
 			
 			if (sn->level == 1) {
 				SetOffsetAttr(sn, goffset);
@@ -382,7 +382,7 @@ int CG(ast_node n)
 			//we have a function with parameters
 		//Based on Louden p 442
 		case FUNC_DEF:
-			printf("In FUNC_DEF Case\n");
+			//printf("In FUNC_DEF Case\n");
 			//add the function name to the symbol table
 			//
 			
@@ -416,7 +416,7 @@ int CG(ast_node n)
 		//has id and parameters - we jump to the quad of the id
 		//Based on Louden p 442
 		case FUNC_CALL:
-			printf("FUNC_CALL in Switch of CG\n");
+			//printf("FUNC_CALL in Switch of CG\n");
 			e.kind = Empty;
 			
 			//load all the params
@@ -452,7 +452,7 @@ int CG(ast_node n)
 			break;
 		
 		case RETURN_S:
-			printf("In RETURN Case\n");
+			//printf("In RETURN Case\n");
 			gq = GenQuad(ret, e, e, e);
 			
 			//if we have a return after the statement
@@ -466,7 +466,7 @@ int CG(ast_node n)
 			
 			// "==" (IS EQUAL TO) operation
 		case OP_EQUALS:
-			printf("In OP_EQUALS Case\n");
+			//printf("In OP_EQUALS Case\n");
 			//Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
@@ -478,7 +478,7 @@ int CG(ast_node n)
 			lrp = CG(n->left_child);
 			ar2 = quads[lrp]->addr1;
 			
-			printf("%s the value\n", ar2.contents.name);
+			//printf("%s the value\n", ar2.contents.name);
 			
 			//right child's result needs to be the other operand
 			if (n->left_child->right_sibling == NULL) {
@@ -486,7 +486,7 @@ int CG(ast_node n)
 			}
 			rrp = CG(n->left_child->right_sibling);
 			ar3 = quads[rrp]->addr1;
-			printf("%s the value\n", ar3.contents.name);
+			//printf("%s the value\n", ar3.contents.name);
 			
 			return GenQuad(eq, ar1, ar2, ar3);
 			break;
@@ -494,7 +494,7 @@ int CG(ast_node n)
 			
 			//ROOT is nothing in itself, so we just start recursing down the tree
 		case ROOT:
-			printf("In ROOT case\n");
+			//printf("In ROOT case\n");
 			CG(n->left_child);
 			break;
 			
@@ -533,7 +533,7 @@ int CG(ast_node n)
 			
 			// "<" (LESS THAN) operation
 		case OP_LESS_THAN:
-			printf("LESS THAN Case in CG\n");
+			//printf("LESS THAN Case in CG\n");
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
 			
@@ -747,7 +747,7 @@ int CG(ast_node n)
 			
 			//Here we do the addition and then we return the position so higher up nodes can find the result
 		case OP_PLUS:
-			printf("OP_PLUS Case in CG\n");
+			//printf("OP_PLUS Case in CG\n");
 			ar1.kind = String;
 			
 			//left result needs to be put in
@@ -780,7 +780,7 @@ int CG(ast_node n)
 			break;
 			
 		case OP_TIMES:
-			printf("OP_TIMES Case in CG\n");
+			//printf("OP_TIMES Case in CG\n");
 			ar1.kind = String;
 			
 			//left result needs to be put in
@@ -814,7 +814,7 @@ int CG(ast_node n)
 			
 			//negate a number
 		case OP_NEGATIVE:
-			printf("OP_NEGATIVE Case in CG\n");
+			//printf("OP_NEGATIVE Case in CG\n");
 			ar1.kind = String;
 			
 			//this should only have one child
@@ -831,14 +831,14 @@ int CG(ast_node n)
 			break;
 			
 		case INT_LITERAL:
-			printf("INT_LITERAL Case in CG\n");
+			//printf("INT_LITERAL Case in CG\n");
 			//Address ar1, ar2, ar3;
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(4);
 			
 			//we are assigning this literal value to ar1
 			ar2.kind = IntConst;
-			printf("n->value.int_value %d \n", n->value.int_value);
+			//printf("n->value.int_value %d \n", n->value.int_value);
 			ar2.contents.val = n->value.int_value;
 			
 			//we don't need ar3
@@ -849,7 +849,7 @@ int CG(ast_node n)
 			
 			
 		case DOUBLE_LITERAL:
-			printf("DOUBLE_LITERAL Case in CG\n");
+			//printf("DOUBLE_LITERAL Case in CG\n");
 			ar1.kind = String;
 			ar1.contents.name = NewTemp(8);
 			
@@ -881,7 +881,7 @@ int CG(ast_node n)
 			
 			//we must insert in the symbol table the child's name
 		case INT_DEC:
-			printf("INT_DEC Case in CG\n");
+			//printf("INT_DEC Case in CG\n");
 			lrp = CG(n->left_child);
 			ar1 = quads[lrp]->addr1;
 			
@@ -890,12 +890,12 @@ int CG(ast_node n)
 			ar3.kind = Empty;
 			
 			//going to insert into symbol table
-			printf("inserting int dec id into sym table \n");
-			printf("%s is the symbol going in\n", ar1.contents.name);
+			//printf("inserting int dec id into sym table \n");
+			//printf("%s is the symbol going in\n", ar1.contents.name);
 			sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
-			printf("Setting type attribute for that\n");
+			//printf("Setting type attribute for that\n");
 			SetTypeAttr(sn, IntT);
-			printf("Set type successfully\n");
+			//printf("Set type successfully\n");
 			
 			if (sn->level == 1) {
 				SetOffsetAttr(sn, goffset);
@@ -911,7 +911,7 @@ int CG(ast_node n)
 			
 			//we must insert the child in the symbol table
 		case DOU_DEC:
-			printf("DOU_DEC Case in CG\n");
+			//printf("DOU_DEC Case in CG\n");
 			lrp = CG(n->left_child);
 			ar1 = quads[lrp]->addr1;
 			
@@ -934,7 +934,7 @@ int CG(ast_node n)
 			break;
 			
 		case FOR_LOOP:
-			printf("FORLOOP Case in CG\n");
+			//printf("FORLOOP Case in CG\n");
 			
 			//the first statement is always executed
 			CG(n->left_child);
@@ -965,7 +965,7 @@ int CG(ast_node n)
 			break;
 			
 		case OP_PRE_INCR:
-			printf("PRE++ Case in CG\n");
+			//printf("PRE++ Case in CG\n");
 			
 			//left result needs to be put in
 			lrp = CG(n->left_child);
@@ -979,7 +979,7 @@ int CG(ast_node n)
 			break;
 			
 		case OP_POST_INCR:
-			printf("POST++ Case in CG\n");
+			//printf("POST++ Case in CG\n");
 			
 			//left result needs to be put in
 			lrp = CG(n->left_child);
@@ -993,7 +993,7 @@ int CG(ast_node n)
 			break;
 			
 		case OP_PRE_DECR:
-			printf("PRE-- Case in CG\n");
+			//printf("PRE-- Case in CG\n");
 			
 			//left result needs to be put in
 			lrp = CG(n->left_child);
@@ -1007,7 +1007,7 @@ int CG(ast_node n)
 			break;
 			
 		case OP_POST_DECR:
-			printf("POST-- Case in CG\n");
+			//printf("POST-- Case in CG\n");
 			
 			//left result needs to be put in
 			lrp = CG(n->left_child);
@@ -1021,7 +1021,7 @@ int CG(ast_node n)
 			break;
 			
 		case IF_ELSE:
-			printf("IF_ELSE Case in CG\n");
+			//printf("IF_ELSE Case in CG\n");
 			t = CG(n->left_child);
 			
 			ta = quads[t]->addr1;
@@ -1030,7 +1030,6 @@ int CG(ast_node n)
 			
 			e.kind = Empty;
 			
-			//this is where we would switch the order for the dowhile
 			testq = GenQuad(if_f, ta, topatch, e);
 			
 			CG(n->left_child->right_sibling);
@@ -1048,10 +1047,31 @@ int CG(ast_node n)
 			
 			break;
 			
+		case IF:
+			//printf("IF Case in CG\n");
+			t = CG(n->left_child);
+			ta = quads[t]->addr1;
+			
+			topatch.kind = Empty;
+			e.kind = Empty;
+			
+			//this is where we would switch the order for the dowhile
+			testq = GenQuad(if_f, ta, topatch, e);
+			
+			CG(n->left_child->right_sibling);
+			
+			nq.kind = IntConst;
+			nq.contents.val = NextQuad();
+			
+			PatchQuad(testq, 2, nq);
+			
+			break;
+			
+			
 			//adapted from THC's code in class
 			//MUST TYPE CHECK THAT t RETURNS AN INT FOR COMPARISON
 		case WHILE_LOOP:
-			printf("WHILE Case in CG\n");
+			//printf("WHILE Case in CG\n");
 			tq = NextQuad();
 			t = CG(n->left_child);
 			
@@ -1107,12 +1127,12 @@ int CG(ast_node n)
 			//the assembler has a built in read facility, so this is very simple
 			//NEED TO DEAL WITH DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's ATTRIBUTE
 		case READ:
-			printf("READ Case in CG\n");
+			//printf("READ Case in CG\n");
 			lrp = CG(n->left_child);
-			printf("read back in for real\n");
+			//printf("read back in for real\n");
 			ar1 = quads[lrp]->addr1;
 			
-			printf("read back in\n");
+			//printf("read back in\n");
 			
 			ar2.kind = Empty;
 			
@@ -1129,7 +1149,7 @@ int CG(ast_node n)
 			//the assembler has a built in write facility, so this is very simple
 			//NEED TO HANDLE DOUBLES HERE TOO BASED ON TYPE CHECK of CHILD's TYPE ATTRIBUTE
 		case WRITE:
-			printf("WRITE Case in CG\n");
+			//printf("WRITE Case in CG\n");
 			lrp = CG(n->left_child);
 			ar1 = quads[lrp]->addr1;
 			
@@ -1143,18 +1163,18 @@ int CG(ast_node n)
 			
 			//we put in a dummy just so that higher ups can use it, also put in symbol table
 		case ID:
-			printf("ID Case in CG\n");
+			//printf("ID Case in CG\n");
 			
 			ar1.contents.name = strdup(n->value.string);
 			
-			printf("%s is the id\n", ar1.contents.name);
+			//printf("%s is the id\n", ar1.contents.name);
 			
-			printf("tried strdup\n");
+			//printf("tried strdup\n");
 			//if (ar1.contents.name == NULL) {
 			//		printf("NULL STRING?!\n");
 			//	}
 			
-			printf("%s is the id\n", ar1.contents.name);
+			//printf("%s is the id\n", ar1.contents.name);
 			
 			ar1.kind = String;
 			//ar1.contents.name = n->value.string;
@@ -1282,7 +1302,7 @@ int GenQuad(OpKind o, Address a, Address b, Address c)
 	//printf("%s",a1);
 	//printf("%s",a2);
 	//printf("%s",a3);
-	printf("(%s,%s,%s,%s)\n",namesOfOps[q->op],a1,a2,a3);
+	//printf("(%s,%s,%s,%s)\n",namesOfOps[q->op],a1,a2,a3);
 	
 	//END DEBUG
 	
@@ -1326,7 +1346,7 @@ char *NewTemp(int siz)
 	//printf("Inserting into Symbol Table\n");
 	SymNode *thesn = InsertIntoSymbolTable(symtab, tempName);
 	
-	printf("%d the scope of %s\n", GetNodeLevel(thesn), tempName);
+	//printf("%d the scope of %s\n", GetNodeLevel(thesn), tempName);
 	
 	if (thesn->level == 1) {
 		SetOffsetAttr(thesn, goffset-siz);

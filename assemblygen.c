@@ -681,7 +681,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				//continue;
 				break;
 			default:
-				printf("Quad not recognized.\n");
+				//printf("Quad not recognized.\n");
 				break;
 				
 		}
@@ -722,11 +722,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		printf("%d\n", i++);
 	}	
 	
+	/*
 	int j = 0;
 	for (j = 0; j < 94; j++) {
 		printf("%d %d\n", j, quadStartLocations[j]);
 	}
-	
+	*/
 	fprintf(file, "%d: HALT 0, 0, 0\n", AssemNum++);
 }
 
