@@ -107,6 +107,133 @@ int CG(ast_node n)
 			GenQuad(brk, e, e, e);
 			
 			break;
+		
+		//just has id which we set its attr to constant
+		case CONSTANT:
+			//first we get the id
+			lrp = CG(n->left_child);
+			//id
+			ar1 = quads[lrp]->addr1;
+			
+			sn = LookupInSymbolTable(symtab, ar1.contents.name);
+			
+			SetFlagsAttr(sn, 1);
+			
+			break;
+			
+		case OP_SIZEOF:
+			//first we get the id
+			lrp = CG(n->left_child);
+			//id
+			ar1 = quads[lrp]->addr1;
+			sn = LookupInSymbolTable(symtab, ar1.contents.name);
+			
+			t = GetTypeAttr(sn);
+			
+			switch (t) {
+				case IntT:
+					tq = 4;
+					break;
+				case DouT:
+					tq = 8;
+					break;
+				case IArT:
+					gq = GetSizeAttr(sn);
+					tq = 4*gq;
+					break;
+				case DArT:
+					gq = GetSizeAttr(sn);
+					tq = 8*gq;
+					break;
+				default:
+					tq = 4;
+					break;
+			}
+			
+			//Address ar1, ar2, ar3;
+			ar1.kind = String;
+			ar1.contents.name = NewTemp(4);
+			
+			//we are assigning this literal value to ar1
+			ar2.kind = IntConst;
+			ar2.contents.val = tq;
+			
+			//we don't need ar3
+			ar3.kind = Empty;
+			
+			return GenQuad(asn, ar1, ar2, ar3);
+			
+			
+			break;
+			
+		case ARRAY_PULL:
+			printf("ARRAY_PULL Case in CG\n");
+			
+			e.kind = Empty;
+			
+			//first we get the id, the name
+			lrp = CG(n->left_child);
+			
+			//then we get the left child, right sibling, which is the index of the array
+			rrp = CG(n->left_child->right_sibling);
+			
+			//id
+			ar1 = quads[lrp]->addr1;
+			
+			//index
+			ar2 = quads[rrp]->addr1;
+			
+			ar3.kind = String;
+			
+			
+			sn = LookupInSymbolTable(symtab, ar1.contents.name);
+			
+			//if int array
+			if (GetTypeAttr(sn) == IArT) {
+				typer = 4;
+			}
+			//if double array
+			else {
+				typer = 8;
+			}
+
+			
+			t = GetOffsetAttr(sn);
+			
+			//we have a constant
+			if (ar2.kind != String) {
+				tq = ar2.contents.val;
+			}
+			//temporary must be changed
+			else {
+				tq = 4;
+			}
+
+			
+			
+			if (typer == 4) {
+				ar3.contents.name = NewTemp(4);
+			}
+			else {
+				ar3.contents.name = NewTemp(8);
+			}
+
+			
+			sn = LookupInSymbolTable(symtab, ar3.contents.name);
+			
+			if (typer == 4) {
+				SetTypeAttr(sn, IntT);
+				SetOffsetAttr(sn, t-(tq*typer));
+			}
+			else {
+				SetTypeAttr(sn, DouT);
+				SetOffsetAttr(sn, t-(tq*typer));
+			}
+			
+			return GenQuad(sym, ar3, e, e);
+			
+			
+			break;
 			
 		case INT_ARRAY_DEC:
 			printf("INT_ARRAY_DEC Case in CG\n");
