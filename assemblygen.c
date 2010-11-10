@@ -153,7 +153,11 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 			AK = write;
 			AssemCommand = "OUT";
 		}
-		else if (quads[i]->op == gotoq) {
+		else if (quads[i]->op == if_f) {	// If False, Jump
+			AK = iffalse;
+			AssemCommand = " ";
+		}
+		else if (quads[i]->op == gotoq) {	// Go to Quad
 			AK = jumptoquad;
 			AssemCommand = "LDA";
 		}
@@ -634,6 +638,12 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				}
 				break;
 			
+			/*** JUMP IF FALSE ***/
+			case iffalse:
+				AssemNum++;
+				AssemNum++;
+				AssemNum++;
+				break;
 			/*** JUMP TO A QUAD ***/
 			case jumptoquad:
 				AssemNum++;
@@ -669,6 +679,33 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		//AssemNum++;
 		i++;
 	}
+								
+	i = 0;
+	AssemNum = 0;
+	while (quads[i] != NULL) {
+		if (quads[i]->op == if_f) {
+			if (quads[i]->addr1.kind == String) {
+				s1 = LookupInSymbolTable(symtab, quads[i]->addr1.contents.name);
+				if (s1->attrs->type == IntT) {
+					fprintf(file, "%d LD 0, %d(5)\n", quadStartLocations[i], s1->attrs->memoffset);
+					fprintf(file, "%d JEQ 7, 1(7)\n", quadStartLocations[i]+1);
+					fprintf(file, "%d LDA 7, %d(7)\n", quadStartLocations[i]+2, (quadStartLocations[quads[i]->addr2.contents.val]) - quadStartLocations[i]);
+				}
+				else if (s1->attrs->type == DouT) {
+					fprintf(file, "%d LDF 0, %d(5)\n", quadStartLocations[i], s1->attrs->memoffset);
+					fprintf(file, "%d JFEQ 7, 1(7)\n", quadStartLocations[i]+1);
+					fprintf(file, "%d LDA 7, %d(7)\n", quadStartLocations[i]+2, (quadStartLocations[quads[i]->addr2.contents.val]) - quadStartLocations[i]);
+				}
+				else {
+					printf("HERPDERP\n");
+				}
+			//fprintf(file, "%d LDA 7, %d(7)\n", quadStartLocations[i], (quadStartLocations[quads[i]->addr1.contents.val]) - quadStartLocations[i]);
+			//fprintf(file, "AssemNum: %d, quads[i]->addr1.contents.val: %d, quadStartLocations[quads[i]->addr1.contents.val: %d\n", AssemNum, quads[i]->addr1.contents.val, quadStartLocations[quads[i]->addr1.contents.val]);
+			}
+			i++;
+		}
+		printf("%d\n", i++);
+	}	
 	
 	int j = 0;
 	for (j = 0; j < 94; j++) {
