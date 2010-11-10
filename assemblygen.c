@@ -186,7 +186,9 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 /***************** CODE GENERATION ******************/
 /****************************************************/
 		
-		printf("%d %s %d \n", AK, AssemCommand, quads[i]->op);
+		fprintf(file, "%d: LD 5, 0(0)\n", AssemNum++);
+		fprintf(file, "%d: LD 6, 0(0)\n", AssemNum++);
+		fprintf(file, "%d: ST 0, 0(0)\n", AssemNum++);
 		switch (AK) {
 				
 			/*** MATH OPERATORS ***/
@@ -677,7 +679,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				//continue;
 				break;
 			default:
-				printf("DERP\n");
+				printf("Quad not recognized.\n");
 				break;
 				
 		}
@@ -710,7 +712,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 					fprintf(file, "%d: LDA 7, %d(7)\n", quadStartLocations[i]+2, (quadStartLocations[quads[i]->addr2.contents.val]) - quadStartLocations[i]);
 				}
 				else {
-					printf("HERPDERP\n");
+					printf("ERROR\n");
 				}
 			}
 			i++;
@@ -722,5 +724,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 	for (j = 0; j < 94; j++) {
 		printf("%d %d\n", j, quadStartLocations[j]);
 	}
+	
+	fprintf(file, "%d: HALT 0, 0, 0\n", AssemNum++);
 }
 
