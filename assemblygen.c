@@ -29,6 +29,8 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 	int i = 0; // Quad number
 	int AssemNum = 0; // Assembly code line number
 	
+	int quadStartLocations[10000];
+	
 	quads = q;
 	symtab = s;
 	
@@ -41,7 +43,8 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 	SymNode *s2;
 	SymNode *s3;
 	
-	while (i <= 90) {
+	while (quads[i] != NULL) {
+		quadStartLocations[i] = AssemNum;
 		
 		char type_to_store = 'i';		// Type of variable to be stored to (default: int)
 		char type_of_storage = 'i';		// Type of variable to be stored (default: int)
@@ -149,6 +152,10 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		else if (quads[i]->op == wri) {		// Write to STD OUT
 			AK = write;
 			AssemCommand = "OUT";
+		}
+		else if (quads[i]->op == gotoq) {
+			AK = jumptoquad;
+			AssemCommand = "LDA";
 		}
 		else if (quads[i]->op == exs) {		// Exit Scope
 			AK = other;
@@ -627,7 +634,11 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				}
 				break;
 			
-								
+			/*** JUMP TO A QUAD ***/
+			case jumptoquad:
+				AssemNum++;
+				break;
+						
 								
 			case enterScope:
 				//printf(" Level %d \n", GetNodeLevel(s1));
@@ -646,6 +657,22 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				
 		}
 		i++;
+	}
+	
+	i = 0;
+	AssemNum = 0;
+	while (quads[i] != NULL) {
+		if (quads[i]->op == gotoq) {
+			fprintf(file, "%d LDA 7, %d(7)\n", quadStartLocations[i], (quadStartLocations[quads[i]->addr1.contents.val]) - quadStartLocations[i]);
+			//fprintf(file, "AssemNum: %d, quads[i]->addr1.contents.val: %d, quadStartLocations[quads[i]->addr1.contents.val: %d\n", AssemNum, quads[i]->addr1.contents.val, quadStartLocations[quads[i]->addr1.contents.val]);
+		}
+		//AssemNum++;
+		i++;
+	}
+	
+	int j = 0;
+	for (j = 0; j < 94; j++) {
+		printf("%d %d\n", j, quadStartLocations[j]);
 	}
 }
 
