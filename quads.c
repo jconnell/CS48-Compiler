@@ -1476,6 +1476,15 @@ int main(int argc, char **argv)
 		i++;
 	}
 	
+	EnterScope(symtab);
+	EnterScope(symtab);
+	char *c = malloc(sizeof(char) *5);
+	c = "a";
+	printf("before segfault?\n");
+	SymNode *sn = LookupInSymbolTable(symtab, c);
+	printf("%d the offset of a is\n", GetOffsetAttr(sn));
+	
+	
 	if(DOASSEMBLY)
 	{
 		//File for final assembly output
