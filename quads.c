@@ -108,9 +108,6 @@ int CG(ast_node n)
 			
 			break;
 			
-		
-
-			
 		case INT_ARRAY_DEC:
 			printf("INT_ARRAY_DEC Case in CG\n");
 			
@@ -154,11 +151,11 @@ int CG(ast_node n)
 			if (sn->level == 1) 
 			{
 				SetOffsetAttr(sn, goffset);
-				goffset -= 4*size;
+				goffset -= 4*t;
 			}
 			else {
 				SetOffsetAttr(sn, foffset);
-				foffset -= 4*size;
+				foffset -= 4*t;
 			}
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
 			
@@ -206,11 +203,11 @@ int CG(ast_node n)
 			
 			if (sn->level == 1) {
 				SetOffsetAttr(sn, goffset);
-				goffset -= 8*size;
+				goffset -= 8*t;
 			}
 			else {
 				SetOffsetAttr(sn, foffset);
-				foffset -= 8*size;
+				foffset -= 8*t;
 			}
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
 			
