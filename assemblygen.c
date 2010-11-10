@@ -188,6 +188,8 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 		
 		fprintf(file, "%d: LD 5, 0(0)\n", AssemNum++);
 		fprintf(file, "%d: LD 6, 0(0)\n", AssemNum++);
+		fprintf(file, "%d: LDF 5, 0(0)\n", AssemNum++);
+		fprintf(file, "%d: LDF 6, 0(0)\n", AssemNum++);
 		fprintf(file, "%d: ST 0, 0(0)\n", AssemNum++);
 		switch (AK) {
 				
