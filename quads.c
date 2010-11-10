@@ -25,7 +25,7 @@ Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
 char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
-	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs", "loadpar", "jne"}; 
+	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs", "loadpar", "jne", "con", "brk"}; 
 
 //Get the wider of the two - int or double
 int MaxType(Address a, Address b)
@@ -92,6 +92,21 @@ int CG(ast_node n)
 	
 	switch (n->node_type) {
 			
+		case CONTINUE_ST:
+			
+			e.kind = Empty;
+
+			GenQuad(con, e, e, e);
+			
+			break;
+			
+		case BREAK_ST:
+			
+			e.kind = Empty;
+			
+			GenQuad(brk, e, e, e);
+			
+			break;
 			
 		case SWITCH_ST:
 			//this is the id or int we compare against
