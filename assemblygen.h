@@ -13,7 +13,7 @@
 #ifndef ASSEM_H_
 #define ASSEM_H_
 
-typedef enum {math, enterScope, exitScope, inequality, assignment, read, write, jumptoquad, iffalse, other} AssemKind;
+typedef enum {math, enterScope, exitScope, inequality, assignment, read, write, jumptoquad, iffalse, loadparam, func_ret, cont, other} AssemKind;
 
 //the main assembly generation function
 void AssemblyGen(Quad** q, FILE* file, SymbolTable* s);
