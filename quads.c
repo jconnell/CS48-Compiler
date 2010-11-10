@@ -25,7 +25,7 @@ Quad **quads;				//array of Quads
 SymbolTable *symtab;		//symbol table
 
 char namesOfOps[][10] = {"rd", "gotoq", "if_f", "asn", "lab", "mul", "divi", "add", "sub", "eq", "wri", "halt", "neq",
-	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs", "loadpar", "jne"}; 
+	"lt", "gt", "gteq", "lteq", "sym", "ret", "ens", "exs", "loadpar", "jne", "con", "brk"}; 
 
 //Get the wider of the two - int or double
 int MaxType(Address a, Address b)
@@ -92,6 +92,130 @@ int CG(ast_node n)
 	
 	switch (n->node_type) {
 			
+		case CONTINUE_ST:
+			
+			e.kind = Empty;
+
+			GenQuad(con, e, e, e);
+			
+			break;
+			
+		case BREAK_ST:
+			
+			e.kind = Empty;
+			
+			GenQuad(brk, e, e, e);
+			
+			break;
+			
+		
+
+			
+		case INT_ARRAY_DEC:
+			printf("INT_ARRAY_DEC Case in CG\n");
+			
+			//first we get the id, the name
+			lrp = CG(n->left_child);
+			
+			//then we get the left child, right sibling, which is the size of the array
+			rrp = CG(n->left_child->right_sibling);
+			
+			//id
+			ar1 = quads[lrp]->addr1;
+			
+			//size
+			ar2 = quads[rrp]->addr1;
+			
+			if (ar2.kind == IntConst) 
+			{
+				t = ar2.contents.val;
+			}
+			//otherwise we have a string
+			else 
+			{
+				sn = LookupInSymbolTable(symtab, ar2.contents.name);
+				v = GetValueAttr(sn);
+				t = v.ival;
+			}
+
+			
+			e.kind = Empty;
+			
+			//going to insert into symbol table
+			printf("inserting int int array id into sym table \n");
+			printf("%s is the symbol going in\n", ar1.contents.name);
+			sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
+			printf("Setting type attribute for that\n");
+			SetTypeAttr(sn, IArT);
+			printf("Set type successfully\n");
+			SetSizeAttr(sn, t);
+			printf("Set size successfully\n");
+			
+			if (sn->level == 1) 
+			{
+				SetOffsetAttr(sn, goffset);
+				goffset -= 4*size;
+			}
+			else {
+				SetOffsetAttr(sn, foffset);
+				foffset -= 4*size;
+			}
+			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
+			
+			break;
+			
+		case DOU_ARRAY_DEC:
+			printf("DOU_ARRAY_DEC Case in CG\n");
+			
+			//first we get the id, the name
+			lrp = CG(n->left_child);
+			
+			//then we get the left child, right sibling, which is the size of the array
+			rrp = CG(n->left_child->right_sibling);
+			
+			//id
+			ar1 = quads[lrp]->addr1;
+			
+			//size
+			ar2 = quads[rrp]->addr1;
+			
+			if (ar2.kind == IntConst) 
+			{
+				t = ar2.contents.val;
+			}
+			//otherwise we have a string
+			else 
+			{
+				sn = LookupInSymbolTable(symtab, ar2.contents.name);
+				v = GetValueAttr(sn);
+				t = v.ival;
+			}
+			
+			
+			e.kind = Empty;
+			
+			//going to insert into symbol table
+			printf("inserting int int array id into sym table \n");
+			printf("%s is the symbol going in\n", ar1.contents.name);
+			sn = InsertIntoSymbolTable(symtab, ar1.contents.name);
+			printf("Setting type attribute for that\n");
+			SetTypeAttr(sn, DArT);
+			printf("Set type successfully\n");
+			SetSizeAttr(sn, t);
+			printf("Set size successfully\n");
+			
+			if (sn->level == 1) {
+				SetOffsetAttr(sn, goffset);
+				goffset -= 8*size;
+			}
+			else {
+				SetOffsetAttr(sn, foffset);
+				foffset -= 8*size;
+			}
+			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
+			
+			break;
+
 			
 		case SWITCH_ST:
 			//this is the id or int we compare against
@@ -650,11 +774,11 @@ int CG(ast_node n)
 			printf("Set type successfully\n");
 			
 			if (sn->level == 1) {
-				SetOffsetAttr(sn, goffset-4);
+				SetOffsetAttr(sn, goffset);
 				goffset -= 4;
 			}
 			else {
-				SetOffsetAttr(sn, foffset-4);
+				SetOffsetAttr(sn, foffset);
 				foffset -= 4;
 			}
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int
@@ -675,31 +799,15 @@ int CG(ast_node n)
 			SetTypeAttr(sn, DouT);
 			
 			if (sn->level == 1) {
-				SetOffsetAttr(sn, goffset-4);
-				goffset -= 4;
+				SetOffsetAttr(sn, goffset);
+				goffset -= 8;
 			}
 			else {
-				SetOffsetAttr(sn, foffset-4);
-				foffset -= 4;
+				SetOffsetAttr(sn, foffset);
+				foffset -= 8;
 			}
 			//PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double
 			break;
-			
-			/*	
-			 case INT_ARRAY_DEC:
-			 InsertIntoSymbolTable(symtab, n->left_child->value.string);
-			 //PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to int array
-			 //WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
-			 //A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
-			 break;
-			 
-			 case DOU_ARRAY_DEC:
-			 InsertIntoSymbolTable(symtab, n->left_child->value.string);
-			 //PLACEHOLDER - Need to set the TYPE ATTRIBUTE in the symbol table to double array
-			 //WE NEED TO FIND A WAY TO STORE THE ARRAY DATA - HOW ARE WE DOING THAT???
-			 //A POINTER IN THE SYMBOL TABLE TO A HEAP STORE????
-			 break;
-			 */	
 			
 		case FOR_LOOP:
 			printf("FORLOOP Case in CG\n");
