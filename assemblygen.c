@@ -661,7 +661,7 @@ void AssemblyGen(Quad** q, FILE* file, SymbolTable* s) {
 				
 			/*** CONTINUE ***/
 			case cont:
-				fprintf(file, "%d: LDA 7, 1(7)\n");
+				fprintf(file, "%d: LDA 7, 1(7)\n", AssemNum++);
 				break;
 						
 								
