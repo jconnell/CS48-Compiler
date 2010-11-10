@@ -31,7 +31,8 @@ typedef enum { ROOT,
 	INT_DEC, DOU_DEC, INT_ARRAY_DEC, DOU_ARRAY_DEC,
 	FUNC_DEF, FUNC_PARAM, FUNC_CALL, CONSTANT,
 	SWITCH_ST, SWITCH_CASE, BREAK_ST, CONTINUE_ST,
-	OP_SIZEOF
+	OP_SIZEOF,
+	ARRAY_PULL
 	} ast_node_type;
 
 /* Structure for nodes of the abstract syntax tree.  You should

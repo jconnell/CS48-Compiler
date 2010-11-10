@@ -139,6 +139,7 @@ static struct token_lookup token_table[] = {
 	{ "BREAK", BREAK_ST},
 	{ "CONTINUE", CONTINUE_ST},
 	{ "SIZEOF", OP_SIZEOF},
+	{ "ARRAYPULL", ARRAY_PULL},
 	{ NULL, 0 }
 };
 
