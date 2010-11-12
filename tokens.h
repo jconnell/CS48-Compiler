@@ -42,3 +42,26 @@
 #define BREAK		291
 #define INCR		292
 #define DECR		293
+#define COMMENT		294
+#define	NUM			295
+#define	ID			296
+
+#define MAXTOKENLEN 100
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#ifndef TRUE 1
+#endif
+
+typedef int TokenType;
+
+extern FILE* source;	/* Source code text file */
+extern FILE* listing;	/* Listing output text file */
+
+extern int TraceScan;	/* TRUE causes token info to be printed to the 
+						 listing file as each token is recognized by scanner.*/
+extern int lineno;		/* Source file's current line number */
+

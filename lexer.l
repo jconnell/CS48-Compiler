@@ -1,7 +1,11 @@
-
-
+%{
+#include "util.h"
+#include "scan.h"
 #include "tokens.h"
 
+char tokenString[MAXTOKENLEN +1]
+	
+	
 digit 		[0-9]
 number 		{digit}+
 letter 		[a-zA-Z]
@@ -42,19 +46,35 @@ whitespace	[ \t]+
 "++"		{return INCR;}
 "--"		{return DECR;}
 
-"="		{return '=';}
-"+"		{return '+';}
-"-"		{return '-';}
-"*"		{return '*';}
-"/"		{return '/';}
-">"		{return '>';}
-"<"		{return '<';}
-"("		{return '(';}
-")"		{return ')';}
-"{"		{return '{';}
-";"		{return ';';}
+"="			{return '=';}
+"+"			{return '+';}
+"-"			{return '-';}
+"*"			{return '*';}
+"/"			{return '/';}
+">"			{return '>';}
+"<"			{return '<';}
+"("			{return '(';}
+")"			{return ')';}
+"{"			{return '{';}
+";"			{return ';';}
 	
 
 %%
 
-
+int getToken(void) {
+	static int firstTime = 1;
+	int currentToken;
+	if (firstTime) {
+		firstTime = 0;
+		lineno++;
+		yyin = source;
+		yyout = listing;
+	}
+	currentToken = yylex();
+	strncpy(tokenString, yytext, MAXTOKENLEN);
+	if (TraceScan) {
+		fprintf(listing, "\t%d: ", lineno);
+		printf("%d  %d\n", currentToken, tokenString);
+	}
+	return currentToken;
+}
