@@ -46,6 +46,7 @@
 #define	NUM			295
 #define	ID			296
 
+
 #define MAXTOKENLEN 100
 
 #ifndef FALSE

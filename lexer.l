@@ -9,7 +9,7 @@ char tokenString[MAXTOKENLEN +1]
 digit 		[0-9]
 number 		{digit}+
 letter 		[a-zA-Z]
-identifier 	{letter}+
+identifier 	{letter}({letter}|{digit})+
 newline 	\n
 whitespace	[ \t]+
 
@@ -24,7 +24,6 @@ whitespace	[ \t]+
 "for"		{return FOR;}
 "int"		{return INT;}
 "double"	{return DOUBLE;}
-"char"		{return CHAR;}
 "switch"	{return SWITCH;}
 "case"		{return CASE;}
 "const"		{return CONST;}
@@ -57,10 +56,14 @@ whitespace	[ \t]+
 ")"			{return ')';}
 "{"			{return '{';}
 ";"			{return ';';}
+
+{number}		{return NUM;}
+{identifier}		{return ID;}
 	
 
 %%
 
+/*straight out of Louden*/
 int getToken(void) {
 	static int firstTime = 1;
 	int currentToken;
