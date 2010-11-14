@@ -35,7 +35,16 @@ whitespace	[ \t]+
 "break"		{return BREAK;}
 "static"	{return STATIC;}
 
-"/*"		{return COMMENT;}
+"/*"		{ char c;
+			  int done = FALSE;
+			  do {
+				  while ((c=input()) != '*')
+					  continue;
+				  while ((c=input()) == '*')
+					  continue;
+				  if (c == '/') done = TRUE;
+				 } while (!done);
+			}	
 "=="		{return EQUALS;}
 "!="		{return NOTEQUALS;}
 ">="		{return GREATEREQ;}
