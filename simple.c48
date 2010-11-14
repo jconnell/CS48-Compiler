@@ -1,0 +1,35 @@
+/*Test of the Lexical Analyzer
+Jonathan Connell and David Kopec
+CS 48
+
+*/
+
+
+int thenumber = 10;
+
+double thecoolnumber = 20.0;
+
+
+int f(int awesome)
+{
+	return awesome * 2;
+}
+
+int main()
+{
+	int j;
+	int n;
+	read n;
+	
+	do
+	{
+		for	(j = 0; j < 8; j++)
+		{
+			f(23);
+			write n;
+		}
+	}
+	while (n < 1000);
+	
+	return 0;
+}
